@@ -11,5 +11,5 @@ typedef struct {
     char* buffer;   // buffer on which the disk is mapped
 } Disk;
 
-Disk* disk_init(char* filename);
+Disk* disk_init(char* buffer);
 void disk_print(Disk* disk);
