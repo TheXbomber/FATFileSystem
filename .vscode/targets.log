@@ -1,4 +1,6 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -6,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Jun  4 14:48:49 2022
+# Make data base, printed on Sat Jun  4 16:51:16 2022
 
 # Variables
 
@@ -22,12 +24,8 @@ DESKTOP_SESSION = ubuntu
 .SHELLFLAGS := -c
 # automatic
 ?F = $(notdir $?)
-# makefile (from 'Makefile', line 6)
-OBJ = main.o disk.o fat.o
 # environment
 XDG_SESSION_CLASS = user
-# makefile (from 'Makefile', line 5)
-SRC = main.c disk.c fat.c
 # environment
 SNAP_COMMON = /var/snap/code/common
 # environment
@@ -47,7 +45,7 @@ GDMSESSION = ubuntu
 # environment
 XMODIFIERS = @im=ibus
 # makefile
-CURDIR := /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
+CURDIR := /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # makefile
 SHELL = /bin/sh
 # environment
@@ -64,8 +62,8 @@ XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 SNAP_INSTANCE_NAME = code
 # environment
 SNAP_ARCH = amd64
-# makefile (from 'Makefile', line 1)
-MAKEFILE_LIST :=  Makefile
+# makefile
+MAKEFILE_LIST := 
 # automatic
 @F = $(notdir $@)
 # environment
@@ -87,7 +85,7 @@ LESSOPEN = | /usr/bin/lesspipe %s
 # environment
 LC_NAME = it_IT.UTF-8
 # environment
-VSCODE_CWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
+VSCODE_CWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # environment
 GSETTINGS_SCHEMA_DIR = /snap/code/97/usr/share/glib-2.0/schemas
 # default
@@ -137,7 +135,7 @@ SNAP_INSTANCE_KEY =
 # environment
 rvm_bin_path = /usr/share/rvm/bin
 # environment
-PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
+PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # default
 .LOADED := 
 # environment
@@ -168,8 +166,6 @@ SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd
 SNAP_CONTEXT = hrFHPZQPALxJc8mnRIaqRGxZOuuv-OkcPjcxEpH_dQvwOTp5y9e9
 # automatic
 +F = $(notdir $+)
-# makefile (from 'Makefile', line 4)
-HEADERS = error.h disk.h fat.h file.h
 # environment
 ELECTRON_NO_ATTACH_CONSOLE = 1
 # environment
@@ -200,14 +196,10 @@ IRBRC = /usr/share/rvm/rubies/ruby-3.1.1/.irbrc
 SNAP_USER_DATA = /home/alessandro/snap/code/97
 # environment
 SHLVL = 0
-# makefile (from 'Makefile', line 2)
-CCOPTS = -g -std=gnu99 -Wall
-# makefile (from 'Makefile', line 1)
-CC = gcc
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d3a02f99-a5f3-48a5-af91-18af3fd73243.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-1df3a629-9652-4a23-bfb8-74e2740bde26.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -217,7 +209,7 @@ SNAP_REVISION = 97
 # environment
 LC_MONETARY = it_IT.UTF-8
 # makefile
-.DEFAULT_GOAL := main
+.DEFAULT_GOAL := 
 # environment
 XDG_CURRENT_DESKTOP = Unity
 # environment
@@ -229,7 +221,7 @@ LC_TELEPHONE = it_IT.UTF-8
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/alessandro
+OLDPWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
 # default
 .VARIABLES := 
 # automatic
@@ -264,8 +256,6 @@ LC_NUMERIC = it_IT.UTF-8
 LC_MEASUREMENT = it_IT.UTF-8
 # environment
 SNAP_NAME = code
-# makefile (from 'Makefile', line 7)
-BIN = main
 # environment
 LC_ALL = C
 # environment
@@ -283,9 +273,6 @@ SUFFIXES :=
 # environment
 SNAP_REEXEC = 
 # environment
- 
-make: *** No rule to make target 'all'.  Stop.
-
 CHROME_DESKTOP = code-url-handler.desktop
 # environment
 WINDOWPATH = 2
@@ -302,11 +289,11 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 20641
+VSCODE_PID = 21141
 # environment
 MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 # variable set hash-table stats:
-# Load=146/1024=14%, Rehash=0, Collisions=24/173=14%
+# Load=140/1024=14%, Rehash=0, Collisions=22/162=14%
 
 # Pattern-specific Variable Values
 
@@ -314,17 +301,13 @@ MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 
 # Directories
 
-# . (device 66309, inode 598731): 13 files, no impossibilities.
+# . (device 66309, inode 598713): 7 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+# 7 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
-%.o: %.c error.h disk.h fat.h file.h
-#  recipe to execute (from 'Makefile', line 15):
-	$(CC) $(CCOPTS) -o $@ $<
-
-# 1 implicit rules, 0 (0.0%) terminal.
+# No implicit rules.
 
 # Files
 
@@ -335,35 +318,19 @@ all:
 #  File does not exist.
 #  File has not been updated.
 
-.PHONY: clean
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-main.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-fat.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-disk.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-03 19:17:07.347078
+#  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Failed to be updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
 
 # Not a target:
 .DEFAULT:
@@ -371,35 +338,27 @@ Makefile:
 #  Modification time never checked.
 #  File has not been updated.
 
-clean:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
+# Not a target:
+GNUmakefile:
+#  Implicit rule search has been done.
 #  File does not exist.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 18):
-	rm -rf *.o *~ $(OBJ) $(BIN) my_disk.img
-
-main: main.c disk.c fat.c
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 12):
-	$(CC) $(CCOPTS) -o $@ $^
+#  File has been updated.
+#  Failed to be updated.
 
 # files hash-table stats:
-# Load=10/1024=1%, Rehash=0, Collisions=0/25=0%
+# Load=6/1024=1%, Rehash=0, Collisions=0/15=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 22 / storage = 163 B / avg = 7 B
-# current buf: size = 8162 B / used = 163 B / count = 22 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 15 / storage = 129 B / avg = 8 B
+# current buf: size = 8162 B / used = 129 B / count = 15 / avg = 8 B
 
-# strcache performance: lookups = 38 / hit rate = 42%
+# strcache performance: lookups = 18 / hit rate = 16%
 # hash-table stats:
-# Load=22/8192=0%, Rehash=0, Collisions=1/38=3%
-# Finished Make data base on Sat Jun  4 14:48:49 2022
+# Load=15/8192=0%, Rehash=0, Collisions=1/18=6%
+# Finished Make data base on Sat Jun  4 16:51:16 2022
 
  

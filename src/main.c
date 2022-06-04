@@ -4,7 +4,11 @@
 #include <stdio.h>
 
 int main (int argc, char** argv) {
-    Disk* disk = disk_init("my_disk.img");
-    disk_print(disk);
+    char* buffer;
+    Disk* disk = disk_init("my_disk.img", buffer);
+    disk_print(disk, buffer);
+
+    int ret = create_file(disk, "test.txt");
+    disk_print(disk, buffer);
     return 0;
 }

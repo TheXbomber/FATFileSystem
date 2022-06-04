@@ -3,10 +3,15 @@ Index                           Content
 Disk
 0 -> FAT_SIZE                   FAT
 FAT_SIZE -> FAT_SIZE + 4        size
-FAT_SIZE + 4 -> FAT_SIZE + 8    start
-FAT_SIZE + 8 -> DISK_SIZE       buffer
+FAT_SIZE + 4 -> FAT_SIZE + 12   start
+FAT_SIZE + 12 -> DISK_SIZE      rest of buffer
 
 Fat
-0 -> 4                          max_blocks
-4 -> 8                          free blocks
-8 -> FAT_SIZE                   array
+0 -> 4                          free blocks
+4 -> 12                         array
+12 -> FAT_SIZE                  rest of fat
+
+
+|-----------------FAT-------------------|-------------------------Free space---------------------------|
+| free_blocks | array (ptr) | FAT array |     size     |     start        |            ...             |
+0             4            12       FAT_SIZE       FAT_SIZE+4         FAT_SIZE+12                  DISK_SIZE

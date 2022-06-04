@@ -3,21 +3,25 @@
 #include <stdio.h>
 #include <sys/mman.h>
 #include <string.h>
+#include <fcntl.h>
 
 Fat* fat_init(char* buffer) {
     if (DEBUG)
-        printf("Initializing FAT...\n");
-    if (DEBUG) printf("FAT size: %d\n", FAT_SIZE);
-    // Fat* fat = mmap(buffer, FAT_SIZE, PROT_READ | PROT_WRITE, MAP_ANONYMOUS, -1, 0);
-    Fat* fat = (Fat*)buffer;
-    fat->max_blocks = FAT_BLOCKS_MAX;
-    if (DEBUG) printf("FAT max blocks: %d\n", fat->max_blocks);
-    fat->free_blocks = fat->max_blocks;
-    if (DEBUG) printf("FAT free blocks: %d\n", fat->free_blocks);
-    fat->array = (FatEntry*)(fat + 8);
+        printf("Initializing FAT...\nFAT size: %ld\n", FAT_SIZE);
+
+    Fat* fat = malloc(sizeof(Fat));
+    fat->free_blocks = FAT_BLOCKS_MAX;
+    if (DEBUG) 
+        printf("FAT free blocks: %d\n", fat->free_blocks);
+    fat->array = malloc(sizeof(FatEntry*));
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {  // initialize empty FAT
         fat->array[i].data = -1;
         fat->array[i].busy = 0;
+        // if (DEBUG) {
+        //     printf("n: %d\td: %d\tb: %c\n", i, fat->array[i].data, fat->array[i].busy);
+        // }
     }
+    if (DEBUG)
+        printf("FAT initalized correctly at %p\n", fat);
     return fat;
 }
