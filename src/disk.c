@@ -15,11 +15,13 @@ Disk* disk_init(char* filename, char* buffer) {
     int ret = ftruncate(buf_fd, DISK_SIZE);
     if (ret)
         handle_error("error in disk_init/ftruncate");
-    buffer = (char*)mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, buf_fd, 0);
+    buffer = (char*) mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, buf_fd, 0);
     if (!buffer)
         handle_error("error in disk_init -> mmap for buffer");
+    if (DEBUG)
+        printf("Succesfully mapped zone %p -> %p\n", buffer, buffer + DISK_SIZE);
     //char* buffer = (char*)malloc(DISK_SIZE);
-    buffer = memset(buffer, 0, DISK_SIZE);
+    buffer = (char*) memset(buffer, 0, DISK_SIZE);
     if (!buffer)
         handle_error("error in disk_init -> memset for buffer");
     
@@ -31,12 +33,15 @@ Disk* disk_init(char* filename, char* buffer) {
     //     printf("\nEND\n");
     // }
 
-    Disk* disk = malloc(sizeof(Disk));
-    disk->fat = fat_init(buffer);
-    disk->size = DISK_SIZE;
+    Disk* disk = (Disk*) buffer;
+    int fatsize = FAT_SIZE;
+    disk->size = DISK_SIZE - sizeof(Disk) - fatsize;
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);
-    disk->start = buffer;
+    disk->start = buffer + FAT_SIZE + sizeof(Disk);
+    if (DEBUG)
+        printf("Disk starts at %p\n", disk->start);
+    disk->fat = fat_init(buffer);
     if (DEBUG)
         printf("Disk initialized correctly at %p\n", disk);
     // if (DEBUG) {
@@ -57,8 +62,8 @@ void disk_print(Disk* disk, char* buffer) {
         printf("n: %d\td: %d\tb: %c\n", i, disk->fat->array[i].data, disk->fat->array[i].busy);
     }
     printf("--- DISK ---\nsize: %d\nstart: %p\ncontent:\n", disk->size, disk->start);
-    for (int i = 0; i < DISK_SIZE; i++) {
-        printf("%c", *((disk->start)+i));
+    for (int i = 0; i < disk->size; i++) {
+        printf("%c", disk->start[i]);
     }
     printf("\n----- END -----\n");
 }

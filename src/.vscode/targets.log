@@ -1,4 +1,6 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -6,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Jun  4 14:48:49 2022
+# Make data base, printed on Thu Jun  9 18:47:21 2022
 
 # Variables
 
@@ -23,11 +25,11 @@ DESKTOP_SESSION = ubuntu
 # automatic
 ?F = $(notdir $?)
 # makefile (from 'Makefile', line 6)
-OBJ = main.o disk.o fat.o
+OBJ = main.o disk.o fat.o file.o
 # environment
 XDG_SESSION_CLASS = user
 # makefile (from 'Makefile', line 5)
-SRC = main.c disk.c fat.c
+SRC = main.c disk.c fat.c file.c
 # environment
 SNAP_COMMON = /var/snap/code/common
 # environment
@@ -57,7 +59,7 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:51331
+JOURNAL_STREAM = 8:51351
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -81,7 +83,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1672
+MANAGERPID = 1683
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -97,7 +99,7 @@ PATH = /home/alessandro/.rvm/gems/ruby-3.1.1/bin:/home/alessandro/.rvm/gems/ruby
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1959,unix/sp7:/tmp/.ICE-unix/1959
+SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1971,unix/sp7:/tmp/.ICE-unix/1971
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -115,7 +117,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = e53875212e504ec8b074ac466506ccfa
+INVOCATION_ID = ff505a826b9348adab13e28e2ca80936
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -143,7 +145,7 @@ PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
 # environment
 GEM_HOME = /home/alessandro/.rvm/gems/ruby-3.1.1
 # environment
-SSH_AGENT_PID = 1921
+SSH_AGENT_PID = 1933
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -207,7 +209,7 @@ CC = gcc
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d3a02f99-a5f3-48a5-af91-18af3fd73243.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-2d44abd2-b126-4ea5-8da6-3a8f079737af.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -229,7 +231,7 @@ LC_TELEPHONE = it_IT.UTF-8
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/alessandro
+OLDPWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # default
 .VARIABLES := 
 # automatic
@@ -271,22 +273,20 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/e0710f64_20bf_461c_ba3d_c939174f7b27
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/10797394_8b1c_445d_8d79_3b2c66d62abf
 # automatic
 ^F = $(notdir $^)
 # environment
 rvm_prefix = /usr/share
 # environment
-GNOME_TERMINAL_SERVICE = :1.1458
+GNOME_TERMINAL_SERVICE = :1.82
 # default
 SUFFIXES := 
 # environment
 SNAP_REEXEC = 
 # environment
- 
-make: *** No rule to make target 'all'.  Stop.
-
 CHROME_DESKTOP = code-url-handler.desktop
+ 
 # environment
 WINDOWPATH = 2
 # default
@@ -302,7 +302,7 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 20641
+VSCODE_PID = 5227
 # environment
 MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 # variable set hash-table stats:
@@ -314,9 +314,9 @@ MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 
 # Directories
 
-# . (device 66309, inode 598731): 13 files, no impossibilities.
+# . (device 66309, inode 598731): 14 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+# 14 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -361,7 +361,7 @@ disk.c:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-03 19:17:07.347078
+#  Last modified 2022-06-04 16:50:48.349084486
 #  File has been updated.
 #  Successfully updated.
 
@@ -379,27 +379,33 @@ clean:
 #  recipe to execute (from 'Makefile', line 18):
 	rm -rf *.o *~ $(OBJ) $(BIN) my_disk.img
 
-main: main.c disk.c fat.c
+main: main.c disk.c fat.c file.c
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 #  recipe to execute (from 'Makefile', line 12):
 	$(CC) $(CCOPTS) -o $@ $^
 
+# Not a target:
+file.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
 # files hash-table stats:
-# Load=10/1024=1%, Rehash=0, Collisions=0/25=0%
+# Load=11/1024=1%, Rehash=0, Collisions=0/27=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 22 / storage = 163 B / avg = 7 B
-# current buf: size = 8162 B / used = 163 B / count = 22 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 23 / storage = 170 B / avg = 7 B
+# current buf: size = 8162 B / used = 170 B / count = 23 / avg = 7 B
 
-# strcache performance: lookups = 38 / hit rate = 42%
+# strcache performance: lookups = 40 / hit rate = 42%
 # hash-table stats:
-# Load=22/8192=0%, Rehash=0, Collisions=1/38=3%
-# Finished Make data base on Sat Jun  4 14:48:49 2022
+# Load=23/8192=0%, Rehash=0, Collisions=1/40=2%
+# Finished Make data base on Thu Jun  9 18:47:21 2022
 
  

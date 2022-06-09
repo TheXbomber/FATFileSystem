@@ -9,14 +9,22 @@ Fat* fat_init(char* buffer) {
     if (DEBUG)
         printf("Initializing FAT...\nFAT size: %ld\n", FAT_SIZE);
 
-    Fat* fat = malloc(sizeof(Fat));
+    Fat* fat = (Fat*) buffer;
+    if (DEBUG)
+        printf("FAT pointer is at %p\n", fat);
     fat->free_blocks = FAT_BLOCKS_MAX;
     if (DEBUG) 
         printf("FAT free blocks: %d\n", fat->free_blocks);
-    fat->array = malloc(sizeof(FatEntry*));
+    fat->array = (FatEntry*) (buffer + sizeof(Fat));
+    if (DEBUG)
+        printf("FAT starts at %p\n", fat->array);
+    if (DEBUG)
+        printf("Sizeof(FatEntry): %ld\n", sizeof(FatEntry));
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {  // initialize empty FAT
-        fat->array[i].data = -1;
-        fat->array[i].busy = 0;
+        // if (DEBUG)
+        //     printf("Accessing position %p\n", &(fat->array[i]));
+        (fat->array[i]).data = -1;
+        (fat->array[i]).busy = 0;
         // if (DEBUG) {
         //     printf("n: %d\td: %d\tb: %c\n", i, fat->array[i].data, fat->array[i].busy);
         // }

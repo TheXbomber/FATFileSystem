@@ -6,10 +6,7 @@ typedef struct {
     char* name;
     int size;
     FatEntry* start;    // pointer to first block of file
-    int num_blocks;     // =(int)ceil(size/BLOCK_SIZE);
-    char* path;
     char is_dir;        // 1 if the file is a directory
-    char* data;         // data contained in the file
 } File;
 
 typedef struct {

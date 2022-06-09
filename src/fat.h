@@ -1,11 +1,11 @@
 #pragma once
 
 #define FAT_BLOCKS_MAX 256
-#define FAT_SIZE FAT_BLOCKS_MAX*sizeof(FatEntry)+sizeof(Fat)
+#define FAT_SIZE sizeof(Fat)+FAT_BLOCKS_MAX*sizeof(FatEntry)
 
 typedef struct {
-    char busy;              // 0 if the block is free
     int data;               // index of next block
+    char busy;              // 0 if the block is free
 } FatEntry;
 
 typedef struct {

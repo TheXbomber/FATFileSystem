@@ -1,5 +1,5 @@
 make --dry-run --always-make --keep-going --print-directory
 make: Entering directory '/home/alessandro/Desktop/FATFileSystem/FATFileSystem/src'
-gcc -g -std=gnu99 -Wall -o main main.c disk.c fat.c
+gcc -g -std=gnu99 -Wall -o main main.c disk.c fat.c file.c
 make: Leaving directory '/home/alessandro/Desktop/FATFileSystem/FATFileSystem/src'
  

@@ -21,21 +21,17 @@ int create_file(Disk* disk, char* filename) {
     file->size = 0;
 
     // request free block(s)
-    file->num_blocks = 1;
-    FatEntry* start_block = request_blocks(disk, file->num_blocks); // TODO
+    FatEntry* start_block = request_blocks(disk, 1); // TODO
     if (!start_block) {
         printf("Unable to create file: not enough blocks available!\n");
         return -1;
     }
     file->start = start_block;
-
-    file->path = "/";   // TODO
     file->is_dir = 0;
-    file->data = 0;
 
     if (DEBUG) {
         printf("File %s created successfully\n", filename);
-        printf("Name: %s\tSize: %d\tStart: %p\tNum blocks: %d\tPath: %s", file->name, file->size, file->start, file->num_blocks, file->path);
+        printf("Name: %s\tSize: %d\tStart: %p", file->name, file->size, file->start);
     }
 
     return 0;
