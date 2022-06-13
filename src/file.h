@@ -5,14 +5,18 @@
 typedef struct {
     char* name;
     int size;
-    FatEntry* start;    // pointer to first block of file
     char is_dir;        // 1 if the file is a directory
+    FatEntry* start;    // pointer to first block of file
+} FileHead;
+
+typedef struct {
+    FatEntry* block;
 } File;
 
 typedef struct {
-    File file;          // a directory is a file with no data
+    FileHead file;          // a directory is a file with no data
     int num_files;
-    File* files;        // list of file in directory
+    FileHead* files;        // list of file in directory
 } Dir;
 
 typedef struct {

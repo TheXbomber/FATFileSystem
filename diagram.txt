@@ -11,6 +11,8 @@ Fat
 4 -> 12                         array
 12 -> FAT_SIZE                  rest of fat
 
+File
+FileHead | File | File | ...
 
 |-----------------FAT-------------------|-------------------------Free space---------------------------|
 | free_blocks | array (ptr) | FAT array |     size     |     start        |            ...             |

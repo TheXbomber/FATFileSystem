@@ -5,7 +5,7 @@
 
 typedef struct {
     int data;               // index of next block
-    char busy;              // 0 if the block is free
+    int busy;              // 0 if the block is free
 } FatEntry;
 
 typedef struct {

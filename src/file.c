@@ -16,23 +16,25 @@ int create_file(Disk* disk, char* filename) {
 
     if (DEBUG)
         printf("Creating file %s...\n", filename);
-    File* file = (File*)malloc(sizeof(File)); // ERROR
-    file->name = filename;
-    file->size = 0;
 
-    // request free block(s)
-    FatEntry* start_block = request_blocks(disk, 1); // TODO
+    // request free block
+    FatEntry* start_block = request_blocks(disk, 1);
     if (!start_block) {
-        printf("Unable to create file: not enough blocks available!\n");
-        return -1;
-    }
-    file->start = start_block;
-    file->is_dir = 0;
+            printf("Unable to create file: not enough blocks available!\n");
+            return -1;
+        }
 
-    if (DEBUG) {
-        printf("File %s created successfully\n", filename);
-        printf("Name: %s\tSize: %d\tStart: %p", file->name, file->size, file->start);
-    }
+    // save file on disk
+    // FileHead* file = write_on_disk(disk);   // TODO
+    // file->name = filename;
+    // file->size = 0;
+    // file->start = start_block;
+    // file->is_dir = 0;
+
+    // if (DEBUG) {
+    //     printf("File %s created successfully\n", filename);
+    //     printf("Name: %s\tSize: %d\tStart: %p", file->name, file->size, file->start);
+    // }
 
     return 0;
 }

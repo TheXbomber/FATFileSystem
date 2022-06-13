@@ -25,23 +25,23 @@ Disk* disk_init(char* filename, char* buffer) {
     if (!buffer)
         handle_error("error in disk_init -> memset for buffer");
     
-    // if (DEBUG) {
-    //     printf("BUFFER:\n");
-    //     for (int i = 0; buffer[i]; i++) {
-    //         printf("%c", buffer[i]);
-    //     }
-    //     printf("\nEND\n");
-    // }
-
+    if (DEBUG) {
+        printf("BUFFER:\n");
+        for (int i = 0; buffer[i]; i++) {
+            printf("%c", buffer[i]);
+        }
+        printf("\nEND\n");
+    }
     Disk* disk = (Disk*) buffer;
     int fatsize = FAT_SIZE;
     disk->size = DISK_SIZE - sizeof(Disk) - fatsize;
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);
-    disk->start = buffer + FAT_SIZE + sizeof(Disk);
+    disk->start = (char*) (buffer + fatsize + sizeof(Disk));
     if (DEBUG)
         printf("Disk starts at %p\n", disk->start);
     disk->fat = fat_init(buffer);
+    printf("First FAT: %p, %d, %d\n", disk->fat->array, disk->fat->array[0].data, disk->fat->array[0].busy);
     if (DEBUG)
         printf("Disk initialized correctly at %p\n", disk);
     // if (DEBUG) {
@@ -59,7 +59,7 @@ void disk_print(Disk* disk, char* buffer) {
     printf("----- DISK INFO -----\n");
     printf("--- FAT ---\nfree_blocks: %d\ncontent:\n", disk->fat->free_blocks);
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
-        printf("n: %d\td: %d\tb: %c\n", i, disk->fat->array[i].data, disk->fat->array[i].busy);
+        printf("n: %d\td: %d\tb: %d\n", i, disk->fat->array[i].data, disk->fat->array[i].busy);
     }
     printf("--- DISK ---\nsize: %d\nstart: %p\ncontent:\n", disk->size, disk->start);
     for (int i = 0; i < disk->size; i++) {
@@ -87,6 +87,7 @@ FatEntry* request_blocks(Disk* disk, int n_blocks) {
             }
             disk->fat->array[i].busy = 1;
             allocated ++;
+            disk->fat->free_blocks--;
             prev_idx = i;
             if (allocated == 1)
                 first = &(disk->fat->array[i]);
