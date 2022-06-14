@@ -13,4 +13,4 @@ typedef struct {
     FatEntry* array;        // FAT
 } Fat;
 
-Fat* fat_init(char* buffer);
+void fat_init(Fat* fat);

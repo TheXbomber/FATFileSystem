@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-Disk* disk_init(char* filename, char* buffer) {
+Disk* disk_init(char* filename) {
     if (DEBUG)
         printf("Initializing disk...\n");
     int buf_fd = open(filename, O_CREAT | O_RDWR, 0666);
@@ -15,7 +15,7 @@ Disk* disk_init(char* filename, char* buffer) {
     int ret = ftruncate(buf_fd, DISK_SIZE);
     if (ret)
         handle_error("error in disk_init/ftruncate");
-    buffer = (char*) mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, buf_fd, 0);
+    char* buffer = (char*) mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, buf_fd, 0);
     if (!buffer)
         handle_error("error in disk_init -> mmap for buffer");
     if (DEBUG)
@@ -32,16 +32,17 @@ Disk* disk_init(char* filename, char* buffer) {
         }
         printf("\nEND\n");
     }
+    
     Disk* disk = (Disk*) buffer;
     int fatsize = FAT_SIZE;
     disk->size = DISK_SIZE - sizeof(Disk) - fatsize;
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);
-    disk->start = (char*) (buffer + fatsize + sizeof(Disk));
-    if (DEBUG)
-        printf("Disk starts at %p\n", disk->start);
-    disk->fat = fat_init(buffer);
-    printf("First FAT: %p, %d, %d\n", disk->fat->array, disk->fat->array[0].data, disk->fat->array[0].busy);
+
+    disk->fat = (Fat*) (buffer + sizeof(Disk));
+    fat_init(disk->fat);
+    //printf("First FAT: %p, %d, %d\n", disk->fat->array, disk->fat->array[0].data, disk->fat->array[0].busy);
+
     if (DEBUG)
         printf("Disk initialized correctly at %p\n", disk);
     // if (DEBUG) {
@@ -55,15 +56,11 @@ Disk* disk_init(char* filename, char* buffer) {
     return disk;
 }
 
-void disk_print(Disk* disk, char* buffer) {
+void disk_print(Disk* disk) {
     printf("----- DISK INFO -----\n");
     printf("--- FAT ---\nfree_blocks: %d\ncontent:\n", disk->fat->free_blocks);
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
         printf("n: %d\td: %d\tb: %d\n", i, disk->fat->array[i].data, disk->fat->array[i].busy);
-    }
-    printf("--- DISK ---\nsize: %d\nstart: %p\ncontent:\n", disk->size, disk->start);
-    for (int i = 0; i < disk->size; i++) {
-        printf("%c", disk->start[i]);
     }
     printf("\n----- END -----\n");
 }

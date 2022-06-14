@@ -14,6 +14,5 @@ Fat
 File
 FileHead | File | File | ...
 
-|-----------------FAT-------------------|-------------------------Free space---------------------------|
-| free_blocks | array (ptr) | FAT array |     size     |     start        |            ...             |
-0             4            12       FAT_SIZE       FAT_SIZE+4         FAT_SIZE+12                  DISK_SIZE
+|-----------------FAT-------------------|---------------------------------------Free space---------------------------------|
+| free_blocks | array (ptr) | FAT array |     fat (ptr)     |     size     |     start        |            ...             |
