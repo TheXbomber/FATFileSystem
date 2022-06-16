@@ -29,19 +29,26 @@ int create_file(Disk* disk, Dir* parent_dir, char* filename) {
     FileHead* file = (FileHead*) find_block(disk);
     if (!file)
         printf("Unable to create file: cannot find a block in the disk!\n");
-    FileHandle* handle = (FileHandle*) file;
-    handle->pos = 0;
-    file->handle = handle;
-    file->is_dir = 0;
     file->name = filename;
+    file->is_dir = 0;
     file->size = 0;
+    file->pos = 0;
     file->parent_dir = parent_dir;
+    parent_dir->num_files++;
+    for (int i = 0; i < parent_dir->num_files; i++) {
+        if (!parent_dir->files[i]) {
+            parent_dir->files[i] = file;
+            if (DEBUG)
+                printf("Inserted file %s into dir %s\n", parent_dir->files[i]->name, parent_dir->name);
+            break;
+        }
+    }
     file->start = start_block;
     file->data = 0;
 
     if (DEBUG) {
         printf("File %s created successfully\n", filename);
-        printf("Name: %s\tSize: %d\tStart: %p\n", file->name, file->size, file->start);
+        printf("Name: %s\tParent directory: %s\tSize: %d\tStart: %p\n", file->name, file->parent_dir->name, file->size, file->start);
     }
 
     return 0;
@@ -68,7 +75,7 @@ Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
     new_dir->start = start_block;
     new_dir->parent_dir = parent_dir;
     new_dir->num_files = 0;
-    new_dir->files = NULL;
+    new_dir->files = (FileHead**) (new_dir + sizeof(Dir));
 
     if (DEBUG) {
         printf("Directory %s created successfully\n", dirname);
@@ -79,13 +86,52 @@ Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
     return new_dir;
 }
 
-// TODO
+int list_dir(Dir* dir) {
+    printf("Content of %s:\n", dir->name);
+    printf("Dir\tName\tSize\n");
+    int i;
+    for(i = 0; i < dir->num_files; i++) {
+        printf("%d\t%s\t%d\n", dir->files[i]->is_dir, dir->files[i]->name, dir->files[i]->size);
+    }
+    return i;
+}
 
-// void read_file(char* filename) {
-//     // if (file_exists(filename)) {    // TODO
-//     //     printf("Unable to read file: file does not exist!\n");
-//     //     return -1;
-//     // }
-//     FileHandle* handle = open_file(filename); // TODO
+FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk) {
+    // 1) Look for the file in the FAT
+    // 2) Return the FileHead
+    // 3) Return the FileHandle
+    if (DEBUG)
+        printf("Opening file %s\n", filename);
+    FileHead* head;
+    char* name;
+    for (int i = 0; i < cur_dir->num_files; i++) {
+        name = cur_dir->files[i]->name;
+        if (!strcmp(filename, name)) {
+            head = cur_dir->files[i];
+            return head;
+        }
+    }
+    printf("File not present in the current_directory!\n");
+    return NULL;
+}
 
-// }
+int read_file(char* filename, Dir* cur_dir, Disk* disk) {
+    // if (file_exists(filename)) {    // TODO
+    //     printf("Unable to read file: file does not exist!\n");
+    //     return -1;
+    // }
+    if (DEBUG)
+        printf("Reading file %s\n", filename);
+    FileHead* head = open_file(filename, cur_dir, disk);
+    if (!head)
+        handle_error("error opening file!");
+    
+    printf("Content of %s:\n", filename);
+    int n_bytes = head->size;
+    int i = 0;
+    for (i = 0; i < n_bytes; i++) {
+        printf("%c", head->data[i]);
+    }
+    printf("\nEnd of content\n");
+    return i;
+}

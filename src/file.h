@@ -9,22 +9,22 @@ typedef struct {
 } FileHandle;
 
 typedef struct {
-    FileHandle* handle; // must be the first
-    int is_dir;         // 0
     char* name;
+    int is_dir;         // 0
     int size;
-    Dir* parent_dir;   // directory that stores the file
+    int pos;            // current position in the file
+    Dir* parent_dir;    // directory that stores the file
     FatEntry* start;    // pointer to first block of file
     char* data;
 } FileHead;
 
 struct Dir {
-    int is_dir;         // 1
     char* name;
+    int is_dir;         // 1
     Dir* parent_dir;
     int num_files;      // number of files
     FatEntry* start;    // position in the FAT    
-    FileHead* files;    // list of files in directory
+    FileHead** files;    // list of files in directory
 };
 
 typedef struct {
@@ -32,35 +32,38 @@ typedef struct {
     char* data;
 } File;
 
-// create a file named filename
+// creates a file named filename and returns 0
 int create_file(Disk* disk, Dir* parent_dir, char* filename);
 
-// delete the file filename
+// deletes the file filename
 int delete_file(char filename);
 
-// read the file filename
-FileHandle* read_file(char* filename);
+// reads the file filename and returns number of bytes read
+int read_file(char* filename, Dir* cur_dir, Disk* disk);
 
-// write n_bytes bytes in the file filename
+// writes n_bytes bytes in the file filename
 int write_file(char* filename, int n_bytes);
 
 // change to position pos in the file filename
 char* seek_in_file(char* filename, int pos);
 
-// create a directory called dir_name
+// creates a directory called dir_name and returns it
 Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
 
-// delete the directory dir
+// deletes the directory dir
 int delete_dir(Disk* disk, char* dirname);
 
-// open the dir directory
+// opens the dir directory
 int change_dir(char* dirname);
 
-// list the directory in the current position
-int list_dir();
+// lists the directory in the current position
+int list_dir(Dir* dir);
 
 // checks if a file named filename already exists
 int file_exists(char* filename);
+
+// opens a file and returns the current position in a FileHandle
+FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk);
 
 // prints the current directory
 void print_cur_dir();

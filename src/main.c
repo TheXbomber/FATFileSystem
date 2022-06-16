@@ -20,16 +20,22 @@ int main (int argc, char** argv) {
     if (!dir)
         handle_error("error creating root directory");
     cur_dir = dir;
-    disk_print(disk);
+    //disk_print(disk);
 
     int ret = create_file(disk, cur_dir, "test1.txt");
-    disk_print(disk);
+    //disk_print(disk);
 
     ret = create_file(disk, cur_dir, "test2.txt");
-    disk_print(disk);
+    //disk_print(disk);
+
+    list_dir(cur_dir);
+
+    ret = read_file("test1.txt", cur_dir, disk);
+    if (DEBUG)
+        printf("Read %d bytes\n", ret);
 
     dir = create_dir(disk, cur_dir, "dir");
-    disk_print(disk);
+    //disk_print(disk);
 
     printf("READ TEST\n");
     int fd = open("my_disk.img", O_RDONLY, 0444);
