@@ -1,5 +1,6 @@
 #include "error.h"
 #include "disk.h"
+#include "file.h"
 #include <stdio.h>
 #include <sys/mman.h>
 #include <string.h>
@@ -57,12 +58,12 @@ Disk* disk_init(char* filename) {
 }
 
 void disk_print(Disk* disk) {
-    printf("----- DISK INFO -----\n");
+    printf("\n----- DISK INFO -----\n");
     printf("--- FAT ---\nfree_blocks: %d\ncontent:\n", disk->fat->free_blocks);
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
-        printf("n: %d\td: %d\tb: %d\n", i, disk->fat->array[i].data, disk->fat->array[i].busy);
+        printf("n: %d\td: %d\tb: %d\ta: %p\n", i, disk->fat->array[i].data, disk->fat->array[i].busy, &(disk->fat->array[i]));
     }
-    printf("\n----- END -----\n");
+    printf("----- END -----\n\n");
 }
 
 FatEntry* request_blocks(Disk* disk, int n_blocks) {
@@ -96,4 +97,15 @@ FatEntry* request_blocks(Disk* disk, int n_blocks) {
         }
     }
     return NULL;
+}
+
+char* find_block(Disk* disk) {
+    char* start = (char*) (disk->fat + FAT_SIZE);
+    char* current = start;
+    while (*current) {
+        current += BLOCK_SIZE;
+    }
+    if (DEBUG)
+        printf("Location on disk: %p\n", current);
+    return current;
 }

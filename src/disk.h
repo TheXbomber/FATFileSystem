@@ -1,7 +1,7 @@
 #pragma once
 #include "fat.h"
 
-#define BLOCK_SIZE 256
+#define BLOCK_SIZE 512
 #define DISK_SIZE 1048576
 
 typedef struct {
@@ -16,4 +16,7 @@ Disk* disk_init(char* filename);
 void disk_print(Disk* disk);
 
 // requst n_blocks blocks
-FatEntry* request_blocks(Disk* disk, int n_blocks);   // TODO
+FatEntry* request_blocks(Disk* disk, int n_blocks);   
+
+// finds the first available space on the disk (in increments of BLOCK_SIZE)
+char* find_block(Disk* disk);
