@@ -5,7 +5,7 @@
 #include <math.h>
 #include <string.h>
 
-int create_file(Disk* disk, Dir* dir, char* filename) {
+int create_file(Disk* disk, Dir* parent_dir, char* filename) {
     // 1) Check if file already exists
     // 2) Request free block(s)
     // 3) Allocate block(s)
@@ -35,7 +35,7 @@ int create_file(Disk* disk, Dir* dir, char* filename) {
     file->is_dir = 0;
     file->name = filename;
     file->size = 0;
-    file->parent_dir = dir;
+    file->parent_dir = parent_dir;
     file->start = start_block;
     file->data = 0;
 
@@ -47,7 +47,7 @@ int create_file(Disk* disk, Dir* dir, char* filename) {
     return 0;
 }
 
-int create_dir(Disk* disk, Dir* dir, char* dirname) {
+Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
     if (DEBUG)
         printf("Creating directory %s...\n", dirname);
 
@@ -55,7 +55,7 @@ int create_dir(Disk* disk, Dir* dir, char* dirname) {
     FatEntry* start_block = request_blocks(disk, 1);
     if (!start_block) {
         handle_error("unable to create directory: not enough blocks available!");
-        return -1;
+        return NULL;
     }
 
     // save directory on disk
@@ -66,21 +66,17 @@ int create_dir(Disk* disk, Dir* dir, char* dirname) {
     new_dir->is_dir = 1;
     new_dir->name = dirname;
     new_dir->start = start_block;
-    new_dir->parent_dir = dir;
+    new_dir->parent_dir = parent_dir;
     new_dir->num_files = 0;
     new_dir->files = NULL;
-    
-    if (!strcmp(dirname, "/"))
-        dir = new_dir;
 
     if (DEBUG) {
         printf("Directory %s created successfully\n", dirname);
-        // if (dir)
-        //     printf("Name: %s\t Parent dir: %s\tStart: %p\n", dir->name, dir->parent_dir->name, dir->start);
-        // NEEDS FIXING
+        if (parent_dir)
+            printf("Name: %s\t Parent dir: %s\tStart: %p\n", new_dir->name, new_dir->parent_dir->name, new_dir->start);
     }
 
-    return 0;
+    return new_dir;
 }
 
 // TODO

@@ -33,7 +33,7 @@ typedef struct {
 } File;
 
 // create a file named filename
-int create_file(Disk* disk, Dir* dir, char* filename);
+int create_file(Disk* disk, Dir* parent_dir, char* filename);
 
 // delete the file filename
 int delete_file(char filename);
@@ -48,7 +48,7 @@ int write_file(char* filename, int n_bytes);
 char* seek_in_file(char* filename, int pos);
 
 // create a directory called dir_name
-int create_dir(Disk* disk, Dir* dir, char* dirname);
+Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
 
 // delete the directory dir
 int delete_dir(Disk* disk, char* dirname);

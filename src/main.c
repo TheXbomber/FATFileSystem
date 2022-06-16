@@ -16,30 +16,31 @@ int main (int argc, char** argv) {
     Disk* disk = disk_init("my_disk.img");
     if (DEBUG)
         printf("Creating root directory...\n");
-    int ret = create_dir(disk, cur_dir, "/");
-    if (ret)
+    Dir* dir = create_dir(disk, NULL, "/");
+    if (!dir)
         handle_error("error creating root directory");
+    cur_dir = dir;
     disk_print(disk);
 
-    ret = create_file(disk, cur_dir, "test1.txt");
+    int ret = create_file(disk, cur_dir, "test1.txt");
     disk_print(disk);
 
     ret = create_file(disk, cur_dir, "test2.txt");
     disk_print(disk);
 
-    ret = create_dir(disk, cur_dir, "dir");
+    dir = create_dir(disk, cur_dir, "dir");
     disk_print(disk);
 
     printf("READ TEST\n");
-    int fd = open("my_disk.img", O_RDWR, 0666);
+    int fd = open("my_disk.img", O_RDONLY, 0444);
     if (!fd)
         printf("Can't open\n");
     char buf[DISK_SIZE];
-    int res = read(fd, &buf, disk->size);
+    int res = read(fd, &buf, DISK_SIZE);
     if (!res)
         printf("Can't read\n");
-    for (int i = 0; buf[i]; i++) {
-        printf("%d: %c\t", i, buf[i]);
+    for (int i = 0; i < DISK_SIZE; i++) {
+        printf("%c", buf[i]);
     }
     printf("\n");
 
