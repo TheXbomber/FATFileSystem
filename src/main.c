@@ -42,6 +42,13 @@ int main (int argc, char** argv) {
     dir = create_dir(disk, cur_dir, "dir1");        // can't create
     dir = create_dir(disk, cur_dir, "dir2");
     list_dir(cur_dir);
+
+    change_dir("dir2", &cur_dir);
+    print_cur_dir();
+    list_dir(cur_dir);
+    change_dir("..", &cur_dir);
+    print_cur_dir();
+
     //disk_print(disk);
 
     printf("READ TEST\n");

@@ -135,6 +135,36 @@ int list_dir(Dir* dir) {
     return sum;
 }
 
+int change_dir(char* dirname, Dir** cur_dir) {
+    if (DEBUG)
+        printf("Opening directory %s ...\n", dirname);
+    if (!strcmp(dirname, "..")) {
+        if (!(*cur_dir)->parent_dir) {
+            printf("Unable to open directory: root has no parent directory!");
+            return -1;
+        }
+        *cur_dir = (*cur_dir)->parent_dir;
+        if (DEBUG)
+            printf("Switched current directory to %s\n", (*cur_dir)->name);
+        return 0;
+    }
+    if (!dir_exists(dirname, *cur_dir)) {
+        printf("Unable to open directory: directory doesn't exist!\n");
+        return -1;
+    }
+    for (int i = 0; i < (*cur_dir)->num_dirs; i++) {
+        if (!strcmp(dirname, (*cur_dir)->dirs[i]->name)) {
+            *cur_dir = (*cur_dir)->dirs[i];
+            if (DEBUG)
+                printf("Switched current directory to %s\n", (*cur_dir)->name);
+            break;
+        }
+    }
+    if (DEBUG)
+        printf("Succesfully opened directory %s\n", dirname);
+    return 0;
+}
+
 FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk) {
     // 1) Look for the file in the FAT
     // 2) Return the FileHead

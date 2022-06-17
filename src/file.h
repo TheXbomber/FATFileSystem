@@ -38,25 +38,25 @@ typedef struct {
 int create_file(Disk* disk, Dir* parent_dir, char* filename);
 
 // deletes the file filename
-int delete_file(char filename);
+int delete_file(char filename); // TODO
 
 // reads the file filename and returns number of bytes read
 int read_file(char* filename, Dir* cur_dir, Disk* disk);
 
 // writes n_bytes bytes in the file filename
-int write_file(char* filename, int n_bytes);
+int write_file(char* filename, int n_bytes);    // TODO
 
 // change to position pos in the file filename
-char* seek_in_file(char* filename, int pos);
+char* seek_in_file(char* filename, int pos);    // TODO
 
 // creates a directory called dir_name and returns it
 Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
 
 // deletes the directory dir
-int delete_dir(Disk* disk, char* dirname);
+int delete_dir(Disk* disk, char* dirname);  // TODO
 
 // opens the dir directory
-int change_dir(char* dirname);
+int change_dir(char* dirname, Dir** cur_dir);
 
 // lists the directory in the current position
 int list_dir(Dir* dir);
