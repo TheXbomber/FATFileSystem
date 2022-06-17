@@ -12,10 +12,11 @@ typedef struct {
     char* name;
     int is_dir;         // 0
     int size;
+    // int free_in_block;  // free bytes in the current block
     int pos;            // current position in the file
     Dir* parent_dir;    // directory that stores the file
     FatEntry* start;    // pointer to first block of file
-    char* data;
+    //char* data;
 } FileHead;
 
 struct Dir {
@@ -31,6 +32,7 @@ struct Dir {
 
 typedef struct {
     FatEntry* block;
+    int free_in_block;
     char* data;
 } File;
 
@@ -43,8 +45,8 @@ int delete_file(char filename); // TODO
 // reads the file filename and returns number of bytes read
 int read_file(char* filename, Dir* cur_dir, Disk* disk);
 
-// writes n_bytes bytes in the file filename
-int write_file(char* filename, int n_bytes);    // TODO
+// writes n_bytes bytes from buf in the file filename
+int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk);    // TODO
 
 // change to position pos in the file filename
 char* seek_in_file(char* filename, int pos);    // TODO

@@ -1,5 +1,6 @@
 #include "error.h"
 #include "fat.h"
+#include "file.h"
 #include <stdio.h>
 #include <sys/mman.h>
 #include <string.h>
@@ -20,6 +21,8 @@ void fat_init(Fat* fat) {
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {  // initialize empty FAT
         fat->array[i].data = -1;
         fat->array[i].busy = 0;
+        fat->array[i].idx = i;
+        fat->array[i].file = (File*)fat + sizeof(Fat);
     }
     //printf("First FAT: %p, %d, %d\n", &(fat->array[0]), fat->array[0].data, fat->array[0].busy);
     if (DEBUG)

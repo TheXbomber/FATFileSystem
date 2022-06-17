@@ -43,13 +43,25 @@ int main (int argc, char** argv) {
     dir = create_dir(disk, cur_dir, "dir2");
     list_dir(cur_dir);
 
+    print_cur_dir();
+    change_dir("..", &cur_dir);     // can't change
     change_dir("dir2", &cur_dir);
     print_cur_dir();
     list_dir(cur_dir);
     change_dir("..", &cur_dir);
     print_cur_dir();
 
-    //disk_print(disk);
+    char* input = "TEST_SCRITTURA_SU_FILE";
+    ret = write_file("test2.txt", input, 22, cur_dir, disk);
+    if (DEBUG && ret != -1) {
+        printf("Written %d bytes\n", ret);
+    }
+    ret = read_file("test2.txt", cur_dir, disk);
+    if (DEBUG && ret != -1) {
+        printf("Read %d bytes\n", ret);
+    }
+
+    disk_print(disk);
 
     printf("READ TEST\n");
     int fd = open("my_disk.img", O_RDONLY, 0444);

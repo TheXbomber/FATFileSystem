@@ -61,7 +61,7 @@ void disk_print(Disk* disk) {
     printf("\n----- DISK INFO -----\n");
     printf("--- FAT ---\nfree_blocks: %d\ncontent:\n", disk->fat->free_blocks);
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
-        printf("n: %d\td: %d\tb: %d\ta: %p\n", i, disk->fat->array[i].data, disk->fat->array[i].busy, &(disk->fat->array[i]));
+        printf("n: %d\td: %d\tb: %d\ti: %d\ta: %p\n", i, disk->fat->array[i].data, disk->fat->array[i].busy, disk->fat->array[i].idx, &(disk->fat->array[i]));
     }
     printf("----- END -----\n\n");
 }
