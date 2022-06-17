@@ -7,24 +7,31 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-Disk* disk_init(char* filename) {
+char* map_file(char* filename) {
     if (DEBUG)
-        printf("Initializing disk...\n");
+        printf("Mapping file...\n");
     int buf_fd = open(filename, O_CREAT | O_RDWR, 0666);
     if (!buf_fd)
-        handle_error("error in disk_init/open");
+        handle_error("error in map_file/open");
     int ret = ftruncate(buf_fd, DISK_SIZE);
     if (ret)
-        handle_error("error in disk_init/ftruncate");
+        handle_error("error in map_file/ftruncate");
     char* buffer = (char*) mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, buf_fd, 0);
     if (!buffer)
-        handle_error("error in disk_init -> mmap for buffer");
+        handle_error("error in map_file -> mmap for buffer");
     if (DEBUG)
         printf("Succesfully mapped zone %p -> %p\n", buffer, buffer + DISK_SIZE);
-    //char* buffer = (char*)malloc(DISK_SIZE);
-    buffer = (char*) memset(buffer, 0, DISK_SIZE);
-    if (!buffer)
-        handle_error("error in disk_init -> memset for buffer");
+    return buffer;
+}
+
+Disk* disk_init(char* buffer, int format) {
+    if (DEBUG)
+        printf("Initializing disk...\n");
+    if (format) {
+        buffer = (char*) memset(buffer, 0, DISK_SIZE);
+        if (!buffer)
+            handle_error("error in disk_init -> memset for buffer");
+    }
     
     if (DEBUG) {
         printf("BUFFER:\n");
@@ -46,13 +53,6 @@ Disk* disk_init(char* filename) {
 
     if (DEBUG)
         printf("Disk initialized correctly at %p\n", disk);
-    // if (DEBUG) {
-    //     printf("BUFFER:\n");
-    //     for (int i = 0; buffer[i]; i++) {
-    //         printf("%c", buffer[i]);
-    //     }
-    //     printf("\nEND\n");
-    // }
     
     return disk;
 }

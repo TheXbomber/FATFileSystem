@@ -23,8 +23,9 @@ struct Dir {
     int is_dir;         // 1
     Dir* parent_dir;
     int num_files;      // number of files
-    FatEntry* start;    // position in the FAT    
-    FileHead** files;    // list of files in directory
+    FatEntry* start;    // position in the FAT
+    Dir** dirs;         // list of subdirectories    
+    FileHead** files;   // list of files in directory
 };
 
 typedef struct {
@@ -59,8 +60,8 @@ int change_dir(char* dirname);
 // lists the directory in the current position
 int list_dir(Dir* dir);
 
-// checks if a file named filename already exists
-int file_exists(char* filename);
+// returns 1 if a file named filename already exists in the current directory
+int file_exists(char* filename, Dir* cur_dir);
 
 // opens a file and returns the current position in a FileHandle
 FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk);

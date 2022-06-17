@@ -5,18 +5,26 @@
 #include <math.h>
 #include <string.h>
 
+int file_exists(char* filename, Dir* cur_dir) {
+    for (int i = 0; i < cur_dir->num_files; i++) {
+        if (!strcmp(cur_dir->files[i]->name, filename)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int create_file(Disk* disk, Dir* parent_dir, char* filename) {
     // 1) Check if file already exists
     // 2) Request free block(s)
     // 3) Allocate block(s)
 
-    // if (file_exists(filename)) {    // TODO
-    //     printf("Unable to create file: file already exists!\n");
-    //     return -1;
-    // }
-
     if (DEBUG)
         printf("Creating file %s...\n", filename);
+    if (file_exists(filename, parent_dir)) {
+        printf("Unable to create file: file already exists!\n");
+        return -1;
+    }
 
     // request free block
     FatEntry* start_block = request_blocks(disk, 1);
@@ -116,12 +124,13 @@ FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk) {
 }
 
 int read_file(char* filename, Dir* cur_dir, Disk* disk) {
-    // if (file_exists(filename)) {    // TODO
-    //     printf("Unable to read file: file does not exist!\n");
-    //     return -1;
-    // }
     if (DEBUG)
         printf("Reading file %s\n", filename);
+    if (!file_exists(filename, cur_dir)) {
+        printf("Unable to read file: file doesn't exist in the current directory!\n");
+        return -1;
+    }
+
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head)
         handle_error("error opening file!");

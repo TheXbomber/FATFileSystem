@@ -9,8 +9,11 @@ typedef struct {
     Fat* fat;       // pointer to start of the FAT
 } Disk;
 
+
+char* map_file(char* filename);
+
 // initialize disk from file
-Disk* disk_init(char* filename);
+Disk* disk_init(char* buffer, int format);
 
 // print info on disk
 void disk_print(Disk* disk);

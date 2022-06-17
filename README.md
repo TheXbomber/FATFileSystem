@@ -3,9 +3,9 @@
 TODO:
 
 IMPLEMENTED:
-- Create file (needs check for existing file)
+- Create file
 - Create dir (needs check for existing dir)
-- Read file (needs check for existing file)
+- Read file
 - List dir
 
 TO IMPLEMENT:

@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun 16 10:41:17 2022
+# Make data base, printed on Fri Jun 17 10:32:28 2022
 
 # Variables
 
@@ -49,13 +49,13 @@ CURDIR := /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # makefile
 SHELL = /bin/sh
 # environment
-SNAP_DATA = /var/snap/code/97
+SNAP_DATA = /var/snap/code/99
 # environment
 VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:47615
+JOURNAL_STREAM = 8:44888
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -79,7 +79,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1678
+MANAGERPID = 1683
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -87,7 +87,7 @@ LC_NAME = it_IT.UTF-8
 # environment
 VSCODE_CWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # environment
-GSETTINGS_SCHEMA_DIR = /snap/code/97/usr/share/glib-2.0/schemas
+GSETTINGS_SCHEMA_DIR = /snap/code/99/usr/share/glib-2.0/schemas
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
 # environment
@@ -95,15 +95,15 @@ PATH = /home/alessandro/.rvm/gems/ruby-3.1.1/bin:/home/alessandro/.rvm/gems/ruby
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1965,unix/sp7:/tmp/.ICE-unix/1965
+SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1970,unix/sp7:/tmp/.ICE-unix/1970
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
 GDK_PIXBUF_MODULE_FILE = /home/alessandro/snap/code/common/.cache/gdk-pixbuf-loaders.cache
 # environment
-SNAP = /snap/code/97
+SNAP = /snap/code/99
 # environment
-SNAP_VERSION = c3511e6c
+SNAP_VERSION = 30d9c6cd
 # environment
 XDG_MENU_PREFIX = gnome-
 # environment
@@ -113,9 +113,9 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = a467313a53474511ac4f3bcbe4219053
+INVOCATION_ID = da1904e96ce346f5b48351feb37b4d1e
 # environment
-GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+GDK_PIXBUF_MODULEDIR = /snap/code/99/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -141,7 +141,7 @@ PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # environment
 GEM_HOME = /home/alessandro/.rvm/gems/ruby-3.1.1
 # environment
-SSH_AGENT_PID = 1927
+SSH_AGENT_PID = 1932
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -155,7 +155,7 @@ LESSCLOSE = /usr/bin/lesspipe %s %s
 # environment
 VSCODE_CLI = 1
 # environment
-VSCODE_CODE_CACHE_PATH = /home/alessandro/.config/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CODE_CACHE_PATH = /home/alessandro/.config/Code/CachedData/30d9c6cd9483b2cc586687151bcbcd635f373630
 # environment
 LOGNAME = alessandro
 # environment
@@ -193,19 +193,19 @@ QT_IM_MODULE = ibus
 # environment
 IRBRC = /usr/share/rvm/rubies/ruby-3.1.1/.irbrc
 # environment
-SNAP_USER_DATA = /home/alessandro/snap/code/97
+SNAP_USER_DATA = /home/alessandro/snap/code/99
 # environment
 SHLVL = 0
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d1a331c5-7fe6-482a-98e3-a2e0c52ce22f.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-1e54512a-24c1-42b1-8b15-d49627cd647d.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
 USER = alessandro
 # environment
-SNAP_REVISION = 97
+SNAP_REVISION = 99
 # environment
 LC_MONETARY = it_IT.UTF-8
 # makefile
@@ -227,7 +227,7 @@ OLDPWD = /home/alessandro
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-eb3d65b7-1.67.2-main.sock
+VSCODE_IPC_HOOK = /run/user/1000/vscode-eb3d65b7-1.68.1-main.sock
 # makefile
 MAKEFLAGS = pqrR
 # environment
@@ -261,13 +261,13 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/01bc1a83_58b0_4007_b23f_3f323d36b7c3
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/9814a7c4_7d46_4929_80d5_a9859d200342
 # automatic
 ^F = $(notdir $^)
 # environment
 rvm_prefix = /usr/share
 # environment
-GNOME_TERMINAL_SERVICE = :1.85
+GNOME_TERMINAL_SERVICE = :1.82
 # default
 SUFFIXES := 
 # environment
@@ -277,6 +277,7 @@ CHROME_DESKTOP = code-url-handler.desktop
 # environment
 WINDOWPATH = 2
 # default
+ 
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
 GJS_DEBUG_OUTPUT = stderr
@@ -285,12 +286,11 @@ GJS_DEBUG_OUTPUT = stderr
 # environment
 LC_ADDRESS = it_IT.UTF-8
 # environment
- 
 LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 4817
+VSCODE_PID = 4959
 # environment
 MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 # variable set hash-table stats:
@@ -360,6 +360,6 @@ GNUmakefile:
 # strcache performance: lookups = 18 / hit rate = 16%
 # hash-table stats:
 # Load=15/8192=0%, Rehash=0, Collisions=1/18=6%
-# Finished Make data base on Thu Jun 16 10:41:17 2022
+# Finished Make data base on Fri Jun 17 10:32:28 2022
 
  
