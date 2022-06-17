@@ -30,7 +30,7 @@ int main (int argc, char** argv) {
     ret = create_file(disk, cur_dir, "test2.txt");  // can't create
     //disk_print(disk);
 
-    list_dir(cur_dir);
+    //list_dir(cur_dir);
 
     ret = read_file("test1.txt", cur_dir, disk);
     ret = read_file("nonexistant.txt", cur_dir, disk);  // can't read
@@ -38,8 +38,11 @@ int main (int argc, char** argv) {
         printf("Read %d bytes\n", ret);
     }
 
-    dir = create_dir(disk, cur_dir, "dir");
-    disk_print(disk);
+    dir = create_dir(disk, cur_dir, "dir1");
+    dir = create_dir(disk, cur_dir, "dir1");        // can't create
+    dir = create_dir(disk, cur_dir, "dir2");
+    list_dir(cur_dir);
+    //disk_print(disk);
 
     printf("READ TEST\n");
     int fd = open("my_disk.img", O_RDONLY, 0444);

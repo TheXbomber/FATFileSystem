@@ -14,6 +14,15 @@ int file_exists(char* filename, Dir* cur_dir) {
     return 0;
 }
 
+int dir_exists(char* dirname, Dir* cur_dir) {
+    for (int i = 0; i < cur_dir->num_dirs; i++) {
+        if (!strcmp(cur_dir->dirs[i]->name, dirname)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int create_file(Disk* disk, Dir* parent_dir, char* filename) {
     // 1) Check if file already exists
     // 2) Request free block(s)
@@ -65,6 +74,10 @@ int create_file(Disk* disk, Dir* parent_dir, char* filename) {
 Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
     if (DEBUG)
         printf("Creating directory %s...\n", dirname);
+    if (parent_dir && dir_exists(dirname, parent_dir)) {
+        printf("Unable to create direcotry: directory already exists!\n");
+        return NULL;
+    }
 
     // request free block
     FatEntry* start_block = request_blocks(disk, 1);
@@ -83,7 +96,19 @@ Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
     new_dir->start = start_block;
     new_dir->parent_dir = parent_dir;
     new_dir->num_files = 0;
+    new_dir->num_dirs = 0;
+    new_dir->dirs = (Dir**) (new_dir + sizeof(Dir) - sizeof(FileHead**));
     new_dir->files = (FileHead**) (new_dir + sizeof(Dir));
+
+    if (parent_dir) {
+        parent_dir->num_dirs++;
+        for (int i = 0; i < parent_dir->num_dirs; i++) {
+            if (!parent_dir->dirs[i]) {
+                parent_dir->dirs[i] = new_dir;
+                break;
+            } 
+        }
+    }
 
     if (DEBUG) {
         printf("Directory %s created successfully\n", dirname);
@@ -96,12 +121,18 @@ Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
 
 int list_dir(Dir* dir) {
     printf("Content of %s:\n", dir->name);
-    printf("Dir\tName\tSize\n");
     int i;
-    for(i = 0; i < dir->num_files; i++) {
+    int sum = 0;
+    printf("Dir\tName\t\tFiles/Size\n");
+    for (i = 0; i < dir->num_dirs; i++) {
+        printf("%d\t%s\t\t%d\n", dir->dirs[i]->is_dir, dir->dirs[i]->name, dir->dirs[i]->num_files);
+    }
+    sum += i;
+    for (i = 0; i < dir->num_files; i++) {
         printf("%d\t%s\t%d\n", dir->files[i]->is_dir, dir->files[i]->name, dir->files[i]->size);
     }
-    return i;
+    sum += i;
+    return sum;
 }
 
 FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk) {

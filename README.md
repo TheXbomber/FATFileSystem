@@ -4,7 +4,7 @@ TODO:
 
 IMPLEMENTED:
 - Create file
-- Create dir (needs check for existing dir)
+- Create dir
 - Read file
 - List dir
 
