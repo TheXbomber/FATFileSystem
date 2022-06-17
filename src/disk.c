@@ -84,6 +84,7 @@ FatEntry* request_blocks(Disk* disk, int n_blocks) {
                 disk->fat->array[prev_idx].data = i;
             }
             disk->fat->array[i].busy = 1;
+            disk->fat->array[i].file = (File*) &(disk->fat->array[i]) + sizeof(FatEntry);
             allocated ++;
             disk->fat->free_blocks--;
             prev_idx = i;

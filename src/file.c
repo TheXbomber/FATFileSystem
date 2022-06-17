@@ -71,7 +71,7 @@ int create_file(Disk* disk, Dir* parent_dir, char* filename) {
 
     if (DEBUG) {
         printf("File %s created successfully\n", filename);
-        printf("Name: %s\tParent directory: %s\tSize: %d\tStart: %p\n", head->name, head->parent_dir->name, head->size, head->start);
+        printf("Name: %s\tParent directory: %s\tSize: %d\tStart: %p\n", head->name, head->parent_dir->name, head->size, head->start->file->data);
     }
 
     return 0;
@@ -129,13 +129,13 @@ int list_dir(Dir* dir) {
     printf("Content of %s:\n", dir->name);
     int i;
     int sum = 0;
-    printf("Dir\tName\t\tFiles/Size\n");
+    printf("Dir\tName\t\tFiles/Size\tLocation:\n");
     for (i = 0; i < dir->num_dirs; i++) {
-        printf("%d\t%s\t\t%d\n", dir->dirs[i]->is_dir, dir->dirs[i]->name, dir->dirs[i]->num_files);
+        printf("%d\t%s\t\t%d\t\t%p\n", dir->dirs[i]->is_dir, dir->dirs[i]->name, dir->dirs[i]->num_files, dir->dirs[i]);
     }
     sum += i;
     for (i = 0; i < dir->num_files; i++) {
-        printf("%d\t%s\t%d\n", dir->files[i]->is_dir, dir->files[i]->name, dir->files[i]->size);
+        printf("%d\t%s\t%d\t\t%p\n", dir->files[i]->is_dir, dir->files[i]->name, dir->files[i]->size, dir->files[i]->start->file);
     }
     sum += i;
     return sum;
@@ -221,13 +221,13 @@ int read_file(char* filename, Dir* cur_dir, Disk* disk) {
         else
             file = disk->fat->array[next_idx].file;
         // read until the block is full
-        if (DEBUG)
-            printf("Reading from block...\n");
-        while (j < n_bytes && j < BLOCK_SIZE - sizeof(File)) {
+        // if (DEBUG)
+        //     printf("Reading from block...\n");
+        while (j < n_bytes && sum < n_bytes && j < BLOCK_SIZE - sizeof(File)) {
             printf("%c", file->data[j]);
             j++;
+            sum++;
         }
-        sum += j;
         if (sum == n_bytes)
             break;
         // read from next block
@@ -246,82 +246,35 @@ int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk)
         }
         printf("\n");
     }
-    // if (!file_exists(filename, cur_dir)) {
-    //     printf("Unable to write file: file doesn't exist in the current directory!\n");
-    //     return -1;
-    // }
 
     FileHead* head = open_file(filename, cur_dir, disk);
-    // int i = 0;
-    // // write until the block is full
-    // while(head->start->file->free_in_block > 0 && i < n_bytes) {
-    //     head->start->file->data[i] = buf[i];
-    //     head->start->file->size++;
-    //     head->start->file->free_in_block--;
-    //     i++;
-    // }
-    // int allocated_blocks = 0;
-    // FatEntry* prev_block;
-    // while (i < n_bytes) {
-    //     if (DEBUG)
-    //         printf("Requesting new block...\n");
-    //     FatEntry* block = request_blocks(disk, 1);
-    //     prev_block = block;
-    //     File* file = (File*) find_block(disk);
-    //     file->block = block;
-    //     file->free_in_block = BLOCK_SIZE - sizeof(File);
-    //     // update the previous block to point to the new one
-    //     if (DEBUG)
-    //         printf("Updating FAT...\n");
-    //     if (!allocated_blocks)
-    //         head->start->data = block->idx;
-    //     else {
-    //         prev_block->data = block->idx;
-    //     }
-    //     allocated_blocks++;
-    //     // for (int j = 0; j < FAT_BLOCKS_MAX; j++) {      // SUS, PROBABLY NEEDS FIXING
-    //     //     // if (!(head->start + j + 1)) {
-    //     //     //     head->start[j+1] = *block;
-    //     //     //     break;
-    //     //     // }
-            
-    //     // }
-    //     // write until the block is full
-    //     if (DEBUG)
-    //         printf("Writing in new block...\n");
-    //     while (file->free_in_block > 0 && i < n_bytes) {
-    //         file->data[i] = buf[i];
-    //         file->free_in_block--;
-    //         head->size++;
-    //         i++;
-    //     }
-    //  }
-    int sum = 0;
+    int sum = 0;    // sum of written bytes
     FatEntry* block = head->start;
-    FatEntry* prev_block;
-    File* file;
-    int next_idx;
+    FatEntry* prev_block;   // to store the previous block when allocating a new one
+    File* file; // pointer to the block
+    int next_idx;   // to update the FAT after allocating a new block
     while (1) {
         int j = 0;
         if (sum == 0)
-            file = (File*) head->start->file;
+            file = head->start->file;
         else
             file = disk->fat->array[next_idx].file;
         // write until the block is full
         if (DEBUG)
-            printf("Writing in block...\n");
-        printf("Free: %d\n", file->free_in_block);
-        while (j < n_bytes && file->free_in_block > 0) {
+            printf("Writing in block (file: %s address: %p %p)...\n", head->name, file, file->data);
+        while (j < n_bytes && sum < n_bytes && file->free_in_block > 0) {
             file->data[j] = buf[j];
             file->free_in_block--;
             head->size++;
+            // printf("Written %d bytes\n", sum);
+            // printf("Remaining bytes in block: %d\n", file->free_in_block);
             j++;
+            sum++;
         }
-        sum += j;
-        printf("Sum is %d\n", sum);
+        // if we are done we exit
         if (sum == n_bytes)
             break;
-        // allocate new block
+        // otherwise we allocate a new block
         if (DEBUG)
             printf("Requesting new block...\n");
         prev_block = block;
@@ -332,6 +285,7 @@ int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk)
         block->file = file;
         file->block = block;
         file->free_in_block = BLOCK_SIZE - sizeof(File);
+        file->data = (char*) file + sizeof(File);
     }
     return sum;
 }

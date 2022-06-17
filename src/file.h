@@ -30,7 +30,7 @@ struct Dir {
     FileHead** files;   // list of files in directory
 };
 
-typedef struct {
+typedef struct File{
     FatEntry* block;
     int free_in_block;
     char* data;

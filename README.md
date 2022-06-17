@@ -1,7 +1,7 @@
 # FATFileSystem
 
 TODO:
-- Fix file pointer in FatEntry
+- Fix write (writes in wrong area)
 
 IMPLEMENTED:
 - Create file

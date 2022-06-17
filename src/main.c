@@ -51,15 +51,25 @@ int main (int argc, char** argv) {
     change_dir("..", &cur_dir);
     print_cur_dir();
 
-    char* input = "TEST_SCRITTURA_SU_FILE";
-    ret = write_file("test2.txt", input, 22, cur_dir, disk);
-    if (DEBUG && ret != -1) {
-        printf("Written %d bytes\n", ret);
-    }
-    ret = read_file("test2.txt", cur_dir, disk);
-    if (DEBUG && ret != -1) {
-        printf("Read %d bytes\n", ret);
-    }
+    // char* input = "TEST_SCRITTURA_SU_FILE";
+    // ret = write_file("test2.txt", input, 22, cur_dir, disk);
+    // if (DEBUG && ret != -1) {
+    //     printf("Written %d bytes\n", ret);
+    // }
+    // ret = read_file("test2.txt", cur_dir, disk);
+    // if (DEBUG && ret != -1) {
+    //     printf("Read %d bytes\n", ret);
+    // }
+
+    //input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dignissim consectetur odio sed malesuada. Nunc bibendum, arcu non semper varius, ipsum ante mattis massa, id facilisis ante lectus eu lorem. Nullam lectus lectus, pretium eu varius non, maximus sit amet lectus. Integer consectetur lectus nec libero facilisis tempor. Curabitur et nulla quis massa sollicitudin aliquam. Mauris semper velit leo, at dapibus odio ultrices eu. Sed euismod finibus enim, at porttitor nisl sodales non. Vestibulum sed lectus turpis.";
+    // ret = write_file("test1.txt", input, 520, cur_dir, disk);
+    // if (DEBUG && ret != -1) {
+    //     printf("Written %d bytes\n", ret);
+    // }
+    // ret = read_file("test1.txt", cur_dir, disk);
+    // if (DEBUG && ret != -1) {
+    //     printf("Read %d bytes\n", ret);
+    // }
 
     disk_print(disk);
 
