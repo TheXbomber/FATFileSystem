@@ -1,6 +1,4 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** No rule to make target 'all'.  Stop.
-
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -8,7 +6,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri Jun 17 10:32:28 2022
+# Make data base, printed on Sat Jun 18 13:05:06 2022
 
 # Variables
 
@@ -55,7 +53,7 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:44888
+JOURNAL_STREAM = 8:51295
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -79,7 +77,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1683
+MANAGERPID = 1679
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -95,7 +93,7 @@ PATH = /home/alessandro/.rvm/gems/ruby-3.1.1/bin:/home/alessandro/.rvm/gems/ruby
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1970,unix/sp7:/tmp/.ICE-unix/1970
+SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1966,unix/sp7:/tmp/.ICE-unix/1966
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -113,7 +111,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = da1904e96ce346f5b48351feb37b4d1e
+INVOCATION_ID = 193a2b64f6004df59f410a8ed88494df
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/99/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -141,7 +139,7 @@ PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # environment
 GEM_HOME = /home/alessandro/.rvm/gems/ruby-3.1.1
 # environment
-SSH_AGENT_PID = 1932
+SSH_AGENT_PID = 1928
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -199,7 +197,7 @@ SHLVL = 0
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-1e54512a-24c1-42b1-8b15-d49627cd647d.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-00cee606-eaba-47a4-b956-4e333bf71f83.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -261,7 +259,7 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/9814a7c4_7d46_4929_80d5_a9859d200342
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/032697d3_0156_4932_9335_37e0792adc4c
 # automatic
 ^F = $(notdir $^)
 # environment
@@ -277,7 +275,6 @@ CHROME_DESKTOP = code-url-handler.desktop
 # environment
 WINDOWPATH = 2
 # default
- 
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
 GJS_DEBUG_OUTPUT = stderr
@@ -286,11 +283,14 @@ GJS_DEBUG_OUTPUT = stderr
 # environment
 LC_ADDRESS = it_IT.UTF-8
 # environment
+ 
+make: *** No rule to make target 'all'.  Stop.
+
 LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 4959
+VSCODE_PID = 4383
 # environment
 MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 # variable set hash-table stats:
@@ -360,6 +360,6 @@ GNUmakefile:
 # strcache performance: lookups = 18 / hit rate = 16%
 # hash-table stats:
 # Load=15/8192=0%, Rehash=0, Collisions=1/18=6%
-# Finished Make data base on Fri Jun 17 10:32:28 2022
+# Finished Make data base on Sat Jun 18 13:05:06 2022
 
  

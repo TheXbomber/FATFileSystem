@@ -1,15 +1,15 @@
 # FATFileSystem
 
 TODO:
-- Fix write (writes in wrong area)
+- Fix write (file->data segfaulting)
 
 IMPLEMENTED:
 - Create file
 - Create dir
-- Read file (to check)
+- Read file (needs fixing)
 - List dir
 - Change dir
-- Write file (partially working)
+- Write file (needs fixing)
 
 TO IMPLEMENT:
 - Delete file

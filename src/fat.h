@@ -6,10 +6,10 @@
 typedef struct File File;
 
 typedef struct {
+    File** file;
     int data;               // index of next block
     int busy;              // 0 if the block is free
     int idx;
-    File* file;
 } FatEntry;
 
 typedef struct {

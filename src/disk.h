@@ -19,7 +19,7 @@ Disk* disk_init(char* buffer, int format);
 void disk_print(Disk* disk);
 
 // requst n_blocks blocks
-FatEntry* request_blocks(Disk* disk, int n_blocks);   
+FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks);   
 
 // finds the first available space on the disk (in increments of BLOCK_SIZE)
 char* find_block(Disk* disk);

@@ -66,7 +66,7 @@ void disk_print(Disk* disk) {
     printf("----- END -----\n\n");
 }
 
-FatEntry* request_blocks(Disk* disk, int n_blocks) {
+FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks) {
     if (!disk)
         handle_error("error in request block (disk error)");
     if (disk->fat->free_blocks < n_blocks)
@@ -75,19 +75,24 @@ FatEntry* request_blocks(Disk* disk, int n_blocks) {
         printf("Requesting blocks...\n");
     int allocated = 0;
     FatEntry* first;
-    int prev_idx;
+    FatEntry* previous;
+    if (prev)
+        previous = prev;
+    //int prev_idx;
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
         if (!(disk->fat->array[i].busy)) {
-            if (allocated) {
-                if (allocated == 1)
-                    first->data = i;
-                disk->fat->array[prev_idx].data = i;
-            }
+            // if (allocated) {
+            //     if (allocated == 1)
+            //         first->data = i;
+            //     disk->fat->array[prev_idx].data = i;
+            // }
             disk->fat->array[i].busy = 1;
-            disk->fat->array[i].file = (File*) &(disk->fat->array[i]) + sizeof(FatEntry);
-            allocated ++;
+            // disk->fat->array[i].file = (File**) &(disk->fat->array[i]) + sizeof(FatEntry);
+            if (allocated || prev)
+                previous->data = disk->fat->array[i].idx;
+            allocated++;
             disk->fat->free_blocks--;
-            prev_idx = i;
+            // what will be returned
             if (allocated == 1)
                 first = &(disk->fat->array[i]);
             if (allocated == n_blocks) {
@@ -95,6 +100,8 @@ FatEntry* request_blocks(Disk* disk, int n_blocks) {
                     printf("Successfully allocated %d blocks starting at %p\n", allocated, first);
                 return first;
             }
+            // needed for next iteration
+            previous = &(disk->fat->array[i]);
         }
     }
     return NULL;
