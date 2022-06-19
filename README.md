@@ -1,15 +1,14 @@
 # FATFileSystem
 
 TODO:
-- Fix read and write (some bytes get lost)
 
 IMPLEMENTED:
 - Create file
 - Create dir
-- Read file (needs fixing)
+- Read file
 - List dir
 - Change dir
-- Write file (needs fixing)
+- Write file
 
 TO IMPLEMENT:
 - Delete file
