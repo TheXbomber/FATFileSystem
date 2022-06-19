@@ -71,7 +71,7 @@ int create_file(Disk* disk, Dir* parent_dir, char* filename) {
     file->block = block;
     file->free_in_block = BLOCK_SIZE - sizeof(File);
     //printf("free: %d\n", file->free_in_block);
-    file->data = (char*) &file->free_in_block + sizeof(file->free_in_block);
+    file->data = (char*) &file->data + sizeof(file->data);
     block->file = file;
     //printf("block->file: %p %p free: %d\n", block->file, *block->file, (*block->file)->free_in_block);
 
