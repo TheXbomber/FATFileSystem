@@ -23,7 +23,10 @@ int main (int argc, char** argv) {
     cur_dir = dir;
     //disk_print(disk);
 
-    //int ret = create_file(disk, cur_dir, "test1.txt");
+    int ret;
+    char* input;
+
+    // ret = create_file(disk, cur_dir, "test1.txt");
     //disk_print(disk);
 
     //ret = create_file(disk, cur_dir, "test2.txt");
@@ -38,7 +41,7 @@ int main (int argc, char** argv) {
     //     printf("Read %d bytes\n", ret);
     // }
 
-    dir = create_dir(disk, cur_dir, "dir1");
+    // dir = create_dir(disk, cur_dir, "dir1");
     // dir = create_dir(disk, cur_dir, "dir1");        // can't create
     // dir = create_dir(disk, cur_dir, "dir2");
     // list_dir(cur_dir);
@@ -51,7 +54,7 @@ int main (int argc, char** argv) {
     // change_dir("..", &cur_dir);
     // print_cur_dir();
 
-    // char* input = "TEST_SCRITTURA_SU_FILE";
+    // input = "TEST_SCRITTURA_SU_FILE";
     // ret = write_file("test2.txt", input, 22, cur_dir, disk);
     // if (DEBUG && ret != -1) {
     //     printf("Written %d bytes\n", ret);
@@ -67,31 +70,33 @@ int main (int argc, char** argv) {
     // if (DEBUG && ret != -1) {
     //     printf("Written %d bytes\n", ret);
     // }
-    disk_print(disk);
+    // disk_print(disk);
     // ret = read_file("test1.txt", cur_dir, disk);
     // if (DEBUG && ret != -1) {
     //     printf("Read %d bytes\n", ret);
     // }
 
-    // ret = create_file(disk, cur_dir, "test3.txt");
-    // input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie suscipit ante sed viverra. Integer arcu mauris, mollis quis gravida egestas, malesuada a ex. Duis ultrices ipsum nec dignissim posuere. Suspendisse sed lorem sed augue venenatis dignissim eget consequat mauris. Proin non tristique neque, eget cursus urna. Integer fringilla blandit dolor, vel convallis purus convallis et. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus hendrerit varius libero quis pellentesque. Vestibulum faucibus felis quam, sit amet consectetur felis vulputate sit amet. Morbi placerat ex in lobortis sagittis. Aliquam eget ex vel nisl tempor maximus. Donec quis elit eu nunc iaculis accumsan ac ac mauris. Mauris accumsan aliquam erat ut pulvinar. Proin faucibus mauris sit amet ex mattis pellentesque. Mauris condimentum arcu turpis, sed accumsan nibh facilisis a. Maecenas erat orci, venenatis nec rutrum non, aliquam nec odio. Quisque nulla velit, congue commodo sem vel, fermentum consectetur eros. Vivamus a orci sit.";
-    // ret = write_file("test3.txt", input, 1040, cur_dir, disk);
-    // if (DEBUG && ret != -1) {
-    //     printf("Written %d bytes\n", ret);
-    // }
-    // disk_print(disk);
-    // ret = read_file("test3.txt", cur_dir, disk);
-    // if (DEBUG && ret != -1) {
-    //     printf("Read %d bytes\n", ret);
-    // }
+    ret = create_file(disk, cur_dir, "test3.txt");
+    input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie suscipit ante sed viverra. Integer arcu mauris, mollis quis gravida egestas, malesuada a ex. Duis ultrices ipsum nec dignissim posuere. Suspendisse sed lorem sed augue venenatis dignissim eget consequat mauris. Proin non tristique neque, eget cursus urna. Integer fringilla blandit dolor, vel convallis purus convallis et. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus hendrerit varius libero quis pellentesque. Vestibulum faucibus felis quam, sit amet consectetur felis vulputate sit amet. Morbi placerat ex in lobortis sagittis. Aliquam eget ex vel nisl tempor maximus. Donec quis elit eu nunc iaculis accumsan ac ac mauris. Mauris accumsan aliquam erat ut pulvinar. Proin faucibus mauris sit amet ex mattis pellentesque. Mauris condimentum arcu turpis, sed accumsan nibh facilisis a. Maecenas erat orci, venenatis nec rutrum non, aliquam nec odio. Quisque nulla velit, congue commodo sem vel, fermentum consectetur eros. Vivamus a orci sit.";
+    ret = write_file("test3.txt", input, 0, 1040, cur_dir, disk);
+    if (DEBUG && ret != -1) {
+        printf("Written %d bytes\n", ret);
+    }
+    disk_print(disk);
+    ret = read_file("test3.txt", 0, 0, cur_dir, disk);
+    if (DEBUG && ret != -1) {
+        printf("Read %d bytes\n", ret);
+    }
+
+    seek_in_file("test3.txt", 540, cur_dir, disk);
 
     // ret = delete_file("test1.txt", cur_dir, disk);
 
     // disk_print(disk);
 
-    delete_dir("dir1", disk, cur_dir);
+    // delete_dir("dir1", disk, cur_dir);
 
-    disk_print(disk);
+    // disk_print(disk);
 
     printf("READ TEST\n");
     int fd = open("my_disk.img", O_RDONLY, 0444);

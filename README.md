@@ -2,6 +2,8 @@
 
 TODO:
 - To implement seek in file I need to implement a system that utilizes the current file position
+- In read_file: pos, n_bytes
+- In write_file: pos
 
 IMPLEMENTED:
 - Create file

@@ -285,7 +285,7 @@ FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk) {
     return NULL;
 }
 
-int read_file(char* filename, Dir* cur_dir, Disk* disk) {
+int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
     if (DEBUG)
         printf("Reading file %s\n", filename);
     if (!file_exists(filename, cur_dir)) {
@@ -298,7 +298,8 @@ int read_file(char* filename, Dir* cur_dir, Disk* disk) {
         handle_error("error opening file!");
     
     printf("Content of %s:\n", filename);
-    int n_bytes = head->size;
+    if (!n_bytes)
+        n_bytes = head->size;
     int sum = 0;
     FatEntry* block = head->start;
     File* file;
@@ -333,7 +334,7 @@ int read_file(char* filename, Dir* cur_dir, Disk* disk) {
     return sum;
 }
 
-int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk) {
+int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
     if (DEBUG) {
         printf("Writing file %s\n", filename);
         printf("Input is:\n");
@@ -403,4 +404,26 @@ int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk)
         block->file = file;
     }
     return sum;
+}
+
+char* seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
+    if (pos < 0) {
+        printf("Position not valid!\n");
+        return NULL;
+    }
+    FileHead* file = open_file(filename, cur_dir, disk);
+    if (!file)
+        handle_error("Error opening file");
+    file->pos = pos;
+
+    FatEntry* block = file->start;
+    int block_num = pos / (BLOCK_SIZE - sizeof(File));
+    int block_offset = pos % (BLOCK_SIZE - sizeof(File));
+    for (int i = 0; i < block_num; i++) {
+        int next_idx = block->data;
+        block = &disk->fat->array[next_idx];
+    }
+    printf("Block number: %d\nBlock offset: %d\n", block_num, block_offset);
+    printf("Position in file %s: %d\n", filename, file->pos);
+    return block->file->data + block_offset;
 }

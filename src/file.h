@@ -40,16 +40,16 @@ typedef struct File{
 int create_file(Disk* disk, Dir* parent_dir, char* filename);
 
 // deletes the file filename
-int delete_file(char* filename, Dir* cur_dir, Disk* disk); // TODO
+int delete_file(char* filename, Dir* cur_dir, Disk* disk);
 
 // reads the file filename and returns number of bytes read
-int read_file(char* filename, Dir* cur_dir, Disk* disk);
+int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk);
 
 // writes n_bytes bytes from buf in the file filename
-int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk);    // TODO
+int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Disk* disk);
 
 // change to position pos in the file filename
-char* seek_in_file(char* filename, int pos);    // TODO
+char* seek_in_file(char* filename, int pos, Dir* cur_dir, Disk*);
 
 // creates a directory called dir_name and returns it
 Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
