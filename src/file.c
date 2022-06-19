@@ -298,16 +298,24 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
         handle_error("error opening file!");
     
     printf("Content of %s:\n", filename);
-    if (!n_bytes)
-        n_bytes = head->size;
     int sum = 0;
     FatEntry* block = head->start;
     File* file;
     int next_idx;
+
+    if (!n_bytes)
+        n_bytes = head->size;
+    int block_num = pos / (BLOCK_SIZE - sizeof(File));
+    int block_offset = pos % (BLOCK_SIZE - sizeof(File));
+
     while (1) {
         int j = 0;
         int idx;
         if (sum == 0) {
+            for (int i = 0; i < block_num; i++) {
+                idx = block->data;
+                block = &disk->fat->array[idx];
+            }
             idx = block->data;
             //printf("Reading from FAT %d\n", idx);
             file = disk->fat->array[idx].file;
@@ -321,10 +329,11 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
         if (DEBUG)
             printf("\nReading from block...\n");
         while (j < n_bytes && sum < n_bytes && j < BLOCK_SIZE - sizeof(File)) {
-            printf("%c", file->data[j]);
+            printf("%c", file->data[j + block_offset]);
             j++;
             sum++;
         }
+        block_offset = 0;
         if (sum == n_bytes)
             break;
         // read from next block
@@ -355,6 +364,14 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
     File* file;     // pointer to the disk block
     int next_idx;   // to update the FAT after allocating a new block
     int buf_pos = 0;    // current position in the input buffer
+
+    if (!n_bytes) {
+        int len = 0;
+        for (int i = 0; buf[i]; i++)
+            len++;
+        n_bytes = len;
+    }
+
     while (1) {
         int j = 0;
         int idx;

@@ -1,9 +1,8 @@
 # FATFileSystem
 
 TODO:
-- To implement seek in file I need to implement a system that utilizes the current file position
-- In read_file: pos, n_bytes
-- In write_file: pos
+- Ability to write a file in a position other the the end
+- Improve seek in file
 
 IMPLEMENTED:
 - Create file
@@ -12,9 +11,10 @@ IMPLEMENTED:
 - List dir
 - Change dir
 - Write file
-- Delete file (needs checking)
-- Delete dir (needs checking)
+- Delete file (needs proper checking)
+- Delete dir (needs proper checking)
+- Seek in file (not final)
 
 TO IMPLEMENT:
-- Seek in file
+
 
