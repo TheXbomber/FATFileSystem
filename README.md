@@ -1,7 +1,7 @@
 # FATFileSystem
 
 TODO:
-- Ability to write a file in a position other the the end
+- Ability to write a file from any position
 - Improve seek in file
 
 IMPLEMENTED:

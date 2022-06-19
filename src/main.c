@@ -82,13 +82,15 @@ int main (int argc, char** argv) {
     if (DEBUG && ret != -1) {
         printf("Written %d bytes\n", ret);
     }
+    input = "NUOVO_TESTO";
+    ret = write_file("test3.txt", input, 1030, 0, cur_dir, disk);
     disk_print(disk);
     ret = read_file("test3.txt", 0, 0, cur_dir, disk);
     if (DEBUG && ret != -1) {
         printf("Read %d bytes\n", ret);
     }
 
-    seek_in_file("test3.txt", 540, cur_dir, disk);
+    // seek_in_file("test3.txt", 540, cur_dir, disk);
 
     // ret = delete_file("test1.txt", cur_dir, disk);
 

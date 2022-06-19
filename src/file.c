@@ -371,11 +371,17 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
             len++;
         n_bytes = len;
     }
+    int block_num = pos / (BLOCK_SIZE - sizeof(File));
+    int block_offset = pos % (BLOCK_SIZE - sizeof(File));
 
     while (1) {
         int j = 0;
         int idx;
         if (sum == 0) {
+            for (int i = 0; i < block_num; i++) {
+                idx = block->data;
+                block = &disk->fat->array[idx];
+            }
             idx = block->data;
             //printf("Writing in FAT %d\n", idx);
             file = disk->fat->array[idx].file;
@@ -387,13 +393,29 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
             //printf("File points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         }
         block = file->block;
+        // char* block_start = file->data;
+        // char* block_end = file->data + (BLOCK_SIZE - sizeof(File));
         // write until the block is full
         if (DEBUG)
             printf("Writing in block (file: %s address: %p %p)...\n", head->name, file, file->data);
         //printf("Free bytes in block: %d\n", file->free_in_block);
         while (j < n_bytes && sum < n_bytes && file->free_in_block > 0) {
-            file->data[j] = buf[buf_pos];
-            printf("%c", file->data[j]);
+            if (!file->data[j + block_offset]) {
+                file->data[j + block_offset] = buf[buf_pos];
+            // printf("%c", file->data[j + block_offset]);
+            } else {
+                char old = file->data[j + block_offset];
+                char new;
+                printf("Shifting...\n");
+                // shift all the data in the block by one position
+                for (int i = j + block_offset + 1; file->data[i-1]; i++) {
+                    new = file->data[i];
+                    file->data[i] = old;
+                    old = new;
+                }
+                file->data[j+ block_offset] = buf[buf_pos];
+            }
+            printf("\n");
             file->free_in_block--;
             head->size++;
             // printf("Written %d bytes\n", sum);
