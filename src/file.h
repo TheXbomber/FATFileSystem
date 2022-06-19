@@ -40,7 +40,7 @@ typedef struct File{
 int create_file(Disk* disk, Dir* parent_dir, char* filename);
 
 // deletes the file filename
-int delete_file(char filename); // TODO
+int delete_file(char* filename, Dir* cur_dir, Disk* disk); // TODO
 
 // reads the file filename and returns number of bytes read
 int read_file(char* filename, Dir* cur_dir, Disk* disk);
@@ -55,7 +55,8 @@ char* seek_in_file(char* filename, int pos);    // TODO
 Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
 
 // deletes the directory dir
-int delete_dir(Disk* disk, char* dirname);  // TODO
+int delete_dir(char* dirname, Disk* disk, Dir* cur_dir);
+int delete_dir_aux(Disk* disk, Dir* dir, int idx);
 
 // opens the dir directory
 int change_dir(char* dirname, Dir** cur_dir);
@@ -69,7 +70,7 @@ int file_exists(char* filename, Dir* cur_dir);
 // returns 1 if a dir named dirname already exists in the current directory
 int dir_exists(char* dirname, Dir* cur_dir);
 
-// opens a file and returns the current position in a FileHandle
+// opens a file and returns its header
 FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk);
 
 // prints the current directory

@@ -132,6 +132,94 @@ Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
     return new_dir;
 }
 
+int delete_file(char* filename, Dir* cur_dir, Disk* disk) {
+    if (DEBUG)
+        printf("Deleting file %s\n", filename);
+
+    FileHead* head = open_file(filename, cur_dir, disk);
+    if (!head) {
+        printf("Unable to delete file: file doesn't exist in current directory!\n");
+        return -1;
+    }
+    
+    // clean the head
+    int entry_idx = head->start->data;
+    int next_entry_idx;
+    //printf("Cleaning head FAT data...\n");
+    head->start->busy = 0;
+    head->start->data = -1;
+    disk->fat->free_blocks++;
+    //printf("Cleaning head disk data...\n");
+    memset(head->start->file, 0, BLOCK_SIZE - sizeof(FileHead));
+
+    // clean the other blocks
+    FatEntry* cur_fat_block = &disk->fat->array[entry_idx];
+    for (int i = 0; cur_fat_block; i++) {
+        next_entry_idx = cur_fat_block->data;
+        //printf("Cleaning block FAT data...\n");
+        cur_fat_block->busy = 0;
+        cur_fat_block->data = -1;
+        disk->fat->free_blocks++;
+        //printf("Cleaning block disk data...\n");
+        memset(cur_fat_block->file, 0, BLOCK_SIZE - sizeof(File));
+        if (next_entry_idx != -1)
+            cur_fat_block = &disk->fat->array[next_entry_idx];
+        else
+            break;
+    }
+    cur_dir->num_files--;
+    printf("File %s deleted succesfully\n", filename);
+    return 0;
+}
+
+int delete_dir(char* dirname, Disk* disk, Dir* cur_dir) {
+    if (!dir_exists(dirname, cur_dir)) {
+        printf("Unable to delete directory: directory doesn't exist!\n");
+        return -1;
+    }
+
+    Dir* to_delete;
+    int idx;
+    for (int i = 0; i < cur_dir->num_dirs; i++) {
+        if (!strcmp(cur_dir->dirs[i]->name, dirname)) {
+            idx = i;
+            to_delete = cur_dir->dirs[i];
+            break;
+        }
+    }
+    int ret = delete_dir_aux(disk, to_delete, idx);
+    if (ret)
+        handle_error("Error in delete_dir_aux!");
+    cur_dir->num_dirs--;
+    printf("Directory %s deleted succesfully\n", dirname);
+    return 0;
+}
+
+int delete_dir_aux(Disk* disk, Dir* dir, int idx) {
+    int ret;
+    Dir* next_dir = dir->dirs[idx+1];
+    // we use a recursive call to delete the subdirectories
+    if (next_dir) {
+        ret = delete_dir_aux(disk, next_dir, idx);
+        if (ret)
+            handle_error("Error in delete_dir_aux!");
+    }
+    // we delete all files in the directory
+    for (int i = 0; i < dir->num_files; i++) {
+        FileHead* file = dir->files[i];
+        ret = delete_file(file->name, dir, disk);
+        if (ret)
+            handle_error("Error in delete_file!");
+    }
+    // we clean the directory's FAT data
+    dir->start->busy = 0;
+    dir->start->data = -1;
+    disk->fat->free_blocks++;
+    // we clean the directory's disk data
+    memset(dir, 0, BLOCK_SIZE - sizeof(Dir));
+    return 0;
+}
+
 int list_dir(Dir* dir) {
     printf("Content of %s:\n", dir->name);
     int i;
@@ -230,7 +318,7 @@ int read_file(char* filename, Dir* cur_dir, Disk* disk) {
         block = file->block;
         // read until the block is full
         if (DEBUG)
-            printf("Reading from block...\n");
+            printf("\nReading from block...\n");
         while (j < n_bytes && sum < n_bytes && j < BLOCK_SIZE - sizeof(File)) {
             printf("%c", file->data[j]);
             j++;
@@ -256,6 +344,8 @@ int write_file(char* filename, char* buf, int n_bytes, Dir* cur_dir, Disk* disk)
     }
 
     FileHead* head = open_file(filename, cur_dir, disk);
+    if (!head)
+        handle_error("Error opening file");
     //printf("Opened file with head %p\n", head);
     int sum = 0;    // sum of written bytes
     FatEntry* block = head->start;

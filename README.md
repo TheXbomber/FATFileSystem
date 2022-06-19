@@ -1,6 +1,7 @@
 # FATFileSystem
 
 TODO:
+- To implement seek in file I need to implement a system that utilizes the current file position
 
 IMPLEMENTED:
 - Create file
@@ -9,9 +10,9 @@ IMPLEMENTED:
 - List dir
 - Change dir
 - Write file
+- Delete file (needs checking)
+- Delete dir (needs checking)
 
 TO IMPLEMENT:
-- Delete file
 - Seek in file
-- Delete dir
 

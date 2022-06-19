@@ -78,16 +78,9 @@ FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks) {
     FatEntry* previous;
     if (prev)
         previous = prev;
-    //int prev_idx;
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
         if (!(disk->fat->array[i].busy)) {
-            // if (allocated) {
-            //     if (allocated == 1)
-            //         first->data = i;
-            //     disk->fat->array[prev_idx].data = i;
-            // }
             disk->fat->array[i].busy = 1;
-            // disk->fat->array[i].file = (File**) &(disk->fat->array[i]) + sizeof(FatEntry);
             if (allocated || prev)
                 previous->data = disk->fat->array[i].idx;
             allocated++;
