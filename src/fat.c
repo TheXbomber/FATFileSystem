@@ -19,7 +19,7 @@ void fat_init(Fat* fat) {
     if (DEBUG)
         printf("FAT starts at %p\n", fat->array);
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {  // initialize empty FAT
-        fat->array[i].file = (File**) &fat->array[i];
+        fat->array[i].file = (File*) &fat->array[i];
         fat->array[i].data = -1;
         fat->array[i].busy = 0;
         fat->array[i].idx = i;

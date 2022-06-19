@@ -21,7 +21,7 @@ int main (int argc, char** argv) {
     if (!dir)
         handle_error("error creating root directory");
     cur_dir = dir;
-    disk_print(disk);
+    //disk_print(disk);
 
     int ret = create_file(disk, cur_dir, "test1.txt");
     //disk_print(disk);
@@ -32,11 +32,11 @@ int main (int argc, char** argv) {
 
     //list_dir(cur_dir);
 
-    // ret = read_file("test1.txt", cur_dir, disk);
-    // ret = read_file("nonexistant.txt", cur_dir, disk);  // can't read
-    // if (DEBUG && ret != -1) {
-    //     printf("Read %d bytes\n", ret);
-    // }
+    ret = read_file("test1.txt", cur_dir, disk);
+    ret = read_file("nonexistant.txt", cur_dir, disk);  // can't read
+    if (DEBUG && ret != -1) {
+        printf("Read %d bytes\n", ret);
+    }
 
     // dir = create_dir(disk, cur_dir, "dir1");
     // dir = create_dir(disk, cur_dir, "dir1");        // can't create
@@ -56,21 +56,22 @@ int main (int argc, char** argv) {
     if (DEBUG && ret != -1) {
         printf("Written %d bytes\n", ret);
     }
-    disk_print(disk);
+    // disk_print(disk);
     ret = read_file("test2.txt", cur_dir, disk);
     if (DEBUG && ret != -1) {
         printf("Read %d bytes\n", ret);
     }
 
-    //input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dignissim consectetur odio sed malesuada. Nunc bibendum, arcu non semper varius, ipsum ante mattis massa, id facilisis ante lectus eu lorem. Nullam lectus lectus, pretium eu varius non, maximus sit amet lectus. Integer consectetur lectus nec libero facilisis tempor. Curabitur et nulla quis massa sollicitudin aliquam. Mauris semper velit leo, at dapibus odio ultrices eu. Sed euismod finibus enim, at porttitor nisl sodales non. Vestibulum sed lectus turpis.";
-    // ret = write_file("test1.txt", input, 520, cur_dir, disk);
-    // if (DEBUG && ret != -1) {
-    //     printf("Written %d bytes\n", ret);
-    // }
-    // ret = read_file("test1.txt", cur_dir, disk);
-    // if (DEBUG && ret != -1) {
-    //     printf("Read %d bytes\n", ret);
-    // }
+    input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dignissim consectetur odio sed malesuada. Nunc bibendum, arcu non semper varius, ipsum ante mattis massa, id facilisis ante lectus eu lorem. Nullam lectus lectus, pretium eu varius non, maximus sit amet lectus. Integer consectetur lectus nec libero facilisis tempor. Curabitur et nulla quis massa sollicitudin aliquam. Mauris semper velit leo, at dapibus odio ultrices eu. Sed euismod finibus enim, at porttitor nisl sodales non. Vestibulum sed lectus turpis.";
+    ret = write_file("test1.txt", input, 520, cur_dir, disk);
+    if (DEBUG && ret != -1) {
+        printf("Written %d bytes\n", ret);
+    }
+    disk_print(disk);
+    ret = read_file("test1.txt", cur_dir, disk);
+    if (DEBUG && ret != -1) {
+        printf("Read %d bytes\n", ret);
+    }
 
     //disk_print(disk);
 

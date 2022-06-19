@@ -1,7 +1,7 @@
 # FATFileSystem
 
 TODO:
-- Fix write (file->data segfaulting)
+- Fix read and write (some bytes get lost)
 
 IMPLEMENTED:
 - Create file
