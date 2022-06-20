@@ -1,8 +1,7 @@
 # FATFileSystem
 
 TODO:
-- Ability to write a file from any position
-- Improve seek in file
+- Make a shell
 
 IMPLEMENTED:
 - Create file
@@ -13,8 +12,7 @@ IMPLEMENTED:
 - Write file
 - Delete file (needs proper checking)
 - Delete dir (needs proper checking)
-- Seek in file (not final)
+- Seek in file
 
 TO IMPLEMENT:
-
 

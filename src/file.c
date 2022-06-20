@@ -296,7 +296,10 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head)
         handle_error("error opening file!");
-    
+    if (pos >= head->size) {
+        printf("Error: position is invalid!\n");
+        return -1;
+    }
     printf("Content of %s:\n", filename);
     int sum = 0;
     FatEntry* block = head->start;
@@ -305,6 +308,8 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
 
     if (!n_bytes)
         n_bytes = head->size;
+    if (pos == -1)
+        pos = head->pos;
     int block_num = pos / (BLOCK_SIZE - sizeof(File));
     int block_offset = pos % (BLOCK_SIZE - sizeof(File));
 
@@ -328,7 +333,7 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
         // read until the block is full
         if (DEBUG)
             printf("\nReading from block...\n");
-        while (j < n_bytes && sum < n_bytes && j < BLOCK_SIZE - sizeof(File)) {
+        while (sum < n_bytes && j < BLOCK_SIZE - sizeof(File)) {
             printf("%c", file->data[j + block_offset]);
             j++;
             sum++;
@@ -357,6 +362,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
     if (!head)
         handle_error("Error opening file");
     //printf("Opened file with head %p\n", head);
+    if (pos && pos >= head->size) {
+        printf("Error: position is invalid!\n");
+        return -1;
+    }
     int sum = 0;    // sum of written bytes
     FatEntry* block = head->start;
     //printf("Head points to %p in the FAT\n", block);
@@ -371,13 +380,22 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
             len++;
         n_bytes = len;
     }
+    if (pos == -1)
+        pos = head->pos;
     int block_num = pos / (BLOCK_SIZE - sizeof(File));
     int block_offset = pos % (BLOCK_SIZE - sizeof(File));
+    // char leftover = 0;
+    // int leftover_inserted = 0;
+    // int shift_start = 0;
+    // char* old_end = 0;
+    // char old_leftover = 0;
+    // File* shift_start_file;
+    // File* shift_next_file = NULL;
 
     while (1) {
         int j = 0;
         int idx;
-        if (sum == 0) {
+        if (!sum) {
             for (int i = 0; i < block_num; i++) {
                 idx = block->data;
                 block = &disk->fat->array[idx];
@@ -393,66 +411,118 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
             //printf("File points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         }
         block = file->block;
-        // char* block_start = file->data;
-        // char* block_end = file->data + (BLOCK_SIZE - sizeof(File));
         // write until the block is full
         if (DEBUG)
-            printf("Writing in block (file: %s address: %p %p)...\n", head->name, file, file->data);
+            printf("Writing in block (file: %s\taddress: %p\tdata: %p)...\n", head->name, file, file->data);
         //printf("Free bytes in block: %d\n", file->free_in_block);
-        while (j < n_bytes && sum < n_bytes && file->free_in_block > 0) {
-            if (!file->data[j + block_offset]) {
-                file->data[j + block_offset] = buf[buf_pos];
+        char* block_end = file->data + BLOCK_SIZE - sizeof(File);
+        while (sum < n_bytes && &file->data[j + block_offset] < block_end) {
+            // printf("File %p\n", file);
+            // if (leftover && !file->data[j]) {
+            //     file->data[j] = leftover;
+            //     leftover_inserted = 1;
+            //     leftover = 0;
+            //     printf("Leftover inserted in pos %d\n", j);
+            // }
+            // else if (!file->data[j + block_offset]) {
+            int override = 0;
+            if (file->data[j + block_offset])
+                override = 1;
+            file->data[j + block_offset] = buf[buf_pos];
             // printf("%c", file->data[j + block_offset]);
-            } else {
-                char old = file->data[j + block_offset];
-                char new;
-                printf("Shifting...\n");
-                // shift all the data in the block by one position
-                for (int i = j + block_offset + 1; file->data[i-1]; i++) {
-                    new = file->data[i];
-                    file->data[i] = old;
-                    old = new;
-                }
-                file->data[j+ block_offset] = buf[buf_pos];
-            }
-            printf("\n");
-            file->free_in_block--;
-            head->size++;
-            // printf("Written %d bytes\n", sum);
-            // printf("Remaining bytes in block: %d\n", file->free_in_block);
+            // } else {
+            //     char old = file->data[j + block_offset];
+            //     char new;
+            //     shift_start = j + block_offset + 1;
+            //     shift_start_file = file;
+            //     // if (old_end)
+            //     //     block_end = old_end;
+            //     // old_end = block_end;
+            //     if (leftover)
+            //         old_leftover = leftover;
+            //     // printf("I start shifting at pos %d\n", shift_start);
+            //     // shift all the data in the block by one position
+            //     for (int i = j + block_offset + 1; file->data[i-1]; i++) {
+            //         new = file->data[i];
+            //         // printf("Free: %d, A: %p, E: %p\n", file->free_in_block, &file->data[i], block_end);
+            //         if (!file->free_in_block && &file->data[i] >= block_end) {
+            //             leftover = old;
+            //             printf("\nCreated leftover '%c' at position %p, end: %p\n", leftover, &file->data[i], block_end);
+            //             break;
+            //         }
+            //         file->data[i] = old;
+            //         // printf("%c", file->data[i]);
+            //         old = new;
+            //     }
+            //     if (old_leftover) {
+            //         file->data[j] = old_leftover;
+            //         leftover_inserted = 1;
+            //         old_leftover = 0;
+            //     } else 
+            //         file->data[j + block_offset] = buf[buf_pos];
+            //     printf(">%c ", file->data[j + block_offset]);
+            // }
+            //printf("\n");
             j++;
             buf_pos++;
             sum++;
+            if (!override)
+                head->size++;
+            if (file->free_in_block) {
+                file->free_in_block--;
+            }
+            // if (!leftover_inserted) {
+            //     buf_pos++;
+            //     head->size++;
+            //     sum++;
+            // } else {
+            //     leftover_inserted = 0;
+            //     j = shift_start;
+            //     file = shift_start_file;
+            //     printf("Back to file %p\n", file);
+            //     continue;
+            // }
+            if (!override && !file->free_in_block)
+                break;
         }
         printf("\n");
         //printf("Written %d bytes\n", sum);
         // if we are done we exit
         if (sum == n_bytes)
             break;
-        // otherwise we allocate a new block
-        if (DEBUG)
-            printf("Requesting new block...\n");
-        prev_block = block;
-        block = request_fat_blocks(disk, prev_block, 1);
-        prev_block->data = block->idx;
-        next_idx = block->idx;
-        file = (File*) find_block(disk);
-        file->block = block;
-        file->free_in_block = BLOCK_SIZE - sizeof(File);
-        file->data = (char*) file + sizeof(File);
-        block->file = file;
+        // otherwise go to the next block or we allocate a new one
+        if (file->block->data == -1) {
+            if (DEBUG)
+                printf("Requesting new block...\n");
+            prev_block = block;
+            block = request_fat_blocks(disk, prev_block, 1);
+            prev_block->data = block->idx;
+            next_idx = block->idx;
+            file = (File*) find_block(disk);
+            file->block = block;
+            file->free_in_block = BLOCK_SIZE - sizeof(File);
+            file->data = (char*) file + sizeof(File);
+            block->file = file;
+        } else {
+            block = &disk->fat->array[file->block->data];
+            next_idx = block->idx;
+        }
+        block_offset = 0;
     }
     return sum;
 }
 
-char* seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
-    if (pos < 0) {
+int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
+    if (pos < 0 && pos != -1) {
         printf("Position not valid!\n");
         return NULL;
     }
     FileHead* file = open_file(filename, cur_dir, disk);
     if (!file)
         handle_error("Error opening file");
+
+    if (pos == -1)
+        file->pos = file->size;
     file->pos = pos;
 
     FatEntry* block = file->start;
@@ -462,7 +532,9 @@ char* seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
         int next_idx = block->data;
         block = &disk->fat->array[next_idx];
     }
-    printf("Block number: %d\nBlock offset: %d\n", block_num, block_offset);
-    printf("Position in file %s: %d\n", filename, file->pos);
-    return block->file->data + block_offset;
+    // printf("Block number: %d\nBlock offset: %d\n", block_num, block_offset);
+    // printf("Position in file %s: %d\n", filename, file->pos);
+    // return block->file->data + block_offset;
+    printf("Current position in file '%s': %d\n", filename, file->pos);
+    return file->pos;
 }

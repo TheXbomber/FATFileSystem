@@ -82,9 +82,9 @@ int main (int argc, char** argv) {
     if (DEBUG && ret != -1) {
         printf("Written %d bytes\n", ret);
     }
-    input = "NUOVO_TESTO";
-    ret = write_file("test3.txt", input, 1030, 0, cur_dir, disk);
-    disk_print(disk);
+    input = "NUOVO_TESTO";  // 972, 1030
+    ret = write_file("test3.txt", input, 970, 0, cur_dir, disk);
+    //disk_print(disk);
     ret = read_file("test3.txt", 0, 0, cur_dir, disk);
     if (DEBUG && ret != -1) {
         printf("Read %d bytes\n", ret);
@@ -100,18 +100,18 @@ int main (int argc, char** argv) {
 
     // disk_print(disk);
 
-    printf("READ TEST\n");
-    int fd = open("my_disk.img", O_RDONLY, 0444);
-    if (!fd)
-        printf("Can't open\n");
-    char buf[DISK_SIZE];
-    int res = read(fd, &buf, DISK_SIZE);
-    if (!res)
-        printf("Can't read\n");
-    for (int i = 0; i < DISK_SIZE; i++) {
-        printf("%c", buf[i]);
-    }
-    printf("\n");
+    // printf("READ TEST\n");
+    // int fd = open("my_disk.img", O_RDONLY, 0444);
+    // if (!fd)
+    //     printf("Can't open\n");
+    // char buf[DISK_SIZE];
+    // int res = read(fd, &buf, DISK_SIZE);
+    // if (!res)
+    //     printf("Can't read\n");
+    // for (int i = 0; i < DISK_SIZE; i++) {
+    //     printf("%c", buf[i]);
+    // }
+    // printf("\n");
 
     return 0;
 }

@@ -39,29 +39,30 @@ typedef struct File{
 // creates a file named filename and returns 0
 int create_file(Disk* disk, Dir* parent_dir, char* filename);
 
-// deletes the file filename
+// deletes the file filename and returns 0
 int delete_file(char* filename, Dir* cur_dir, Disk* disk);
 
-// reads the file filename and returns number of bytes read
+// reads the file filename from position pos (-1 for current position) and returns number of bytes read
 int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk);
 
-// writes n_bytes bytes from buf in the file filename
+// writes n_bytes bytes from buf in the file filename from position pos (-1 for current position) and returns the number of bytes written
 int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Disk* disk);
 
-// change to position pos in the file filename
-char* seek_in_file(char* filename, int pos, Dir* cur_dir, Disk*);
+// change to position pos in the file filename and return the postion
+int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk*);
 
 // creates a directory called dir_name and returns it
 Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
 
-// deletes the directory dir
+// deletes the directory dir and returns 0
 int delete_dir(char* dirname, Disk* disk, Dir* cur_dir);
+// auxiliary function for delete_dir
 int delete_dir_aux(Disk* disk, Dir* dir, int idx);
 
-// opens the dir directory
+// opens the dir directory and returns 0
 int change_dir(char* dirname, Dir** cur_dir);
 
-// lists the directory in the current position
+// lists the directory in the current position and returns the number of directories listed
 int list_dir(Dir* dir);
 
 // returns 1 if a file named filename already exists in the current directory
