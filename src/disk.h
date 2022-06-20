@@ -12,14 +12,14 @@ typedef struct {
 
 char* map_file(char* filename);
 
-// initialize disk from file
+// initializes disk from file and returns the pointer to it
 Disk* disk_init(char* buffer, int format);
 
-// print info on disk
+// prints info about the disk
 void disk_print(Disk* disk);
 
-// requst n_blocks blocks
+// requsts n_blocks blocks and returns the pointer to the first
 FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks);   
 
-// finds the first available space on the disk (in increments of BLOCK_SIZE)
+// finds the first available space on the disk (in increments of BLOCK_SIZE) and returns a pointer to it
 char* find_block(Disk* disk);

@@ -17,4 +17,5 @@ typedef struct {
     FatEntry* array;        // FAT
 } Fat;
 
+// initializes the FAT structure
 void fat_init(Fat* fat);

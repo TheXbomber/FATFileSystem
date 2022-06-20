@@ -515,7 +515,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
 int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
     if (pos < 0 && pos != -1) {
         printf("Position not valid!\n");
-        return NULL;
+        return -1;
     }
     FileHead* file = open_file(filename, cur_dir, disk);
     if (!file)
@@ -525,13 +525,13 @@ int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
         file->pos = file->size;
     file->pos = pos;
 
-    FatEntry* block = file->start;
-    int block_num = pos / (BLOCK_SIZE - sizeof(File));
-    int block_offset = pos % (BLOCK_SIZE - sizeof(File));
-    for (int i = 0; i < block_num; i++) {
-        int next_idx = block->data;
-        block = &disk->fat->array[next_idx];
-    }
+    // FatEntry* block = file->start;
+    // int block_num = pos / (BLOCK_SIZE - sizeof(File));
+    // int block_offset = pos % (BLOCK_SIZE - sizeof(File));
+    // for (int i = 0; i < block_num; i++) {
+    //     int next_idx = block->data;
+    //     block = &disk->fat->array[next_idx];
+    // }
     // printf("Block number: %d\nBlock offset: %d\n", block_num, block_offset);
     // printf("Position in file %s: %d\n", filename, file->pos);
     // return block->file->data + block_offset;
