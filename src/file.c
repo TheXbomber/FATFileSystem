@@ -23,7 +23,7 @@ int dir_exists(char* dirname, Dir* cur_dir) {
     return 0;
 }
 
-int create_file(Disk* disk, Dir* parent_dir, char* filename) {
+int create_file(char* filename, Dir* parent_dir, Disk* disk) {
     // 1) Check if file already exists
     // 2) Request free block(s)
     // 3) Allocate block(s)
@@ -84,7 +84,7 @@ int create_file(Disk* disk, Dir* parent_dir, char* filename) {
     return 0;
 }
 
-Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname) {
+Dir* create_dir(char* dirname, Dir* parent_dir, Disk* disk) {
     if (DEBUG)
         printf("Creating directory %s...\n", dirname);
     if (parent_dir && dir_exists(dirname, parent_dir)) {
@@ -172,7 +172,7 @@ int delete_file(char* filename, Dir* cur_dir, Disk* disk) {
     return 0;
 }
 
-int delete_dir(char* dirname, Disk* disk, Dir* cur_dir) {
+int delete_dir(char* dirname, Dir* cur_dir, Disk* disk) {
     if (!dir_exists(dirname, cur_dir)) {
         printf("Unable to delete directory: directory doesn't exist!\n");
         return -1;
@@ -537,4 +537,8 @@ int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
     // return block->file->data + block_offset;
     printf("Current position in file '%s': %d\n", filename, file->pos);
     return file->pos;
+}
+
+void print_cur_dir(Dir* cur_dir) {
+    printf("Current directory: %s\n", cur_dir->name);
 }

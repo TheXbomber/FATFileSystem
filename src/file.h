@@ -37,7 +37,7 @@ typedef struct File{
 } File;
 
 // creates a file named filename and returns 0
-int create_file(Disk* disk, Dir* parent_dir, char* filename);
+int create_file(char* filename, Dir* parent_dir, Disk* disk);
 
 // deletes the file filename and returns 0
 int delete_file(char* filename, Dir* cur_dir, Disk* disk);
@@ -52,10 +52,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
 int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk*);
 
 // creates a directory called dir_name and returns it
-Dir* create_dir(Disk* disk, Dir* parent_dir, char* dirname);
+Dir* create_dir(char* dirname, Dir* parent_dir, Disk* disk);
 
 // deletes the directory dir and returns 0
-int delete_dir(char* dirname, Disk* disk, Dir* cur_dir);
+int delete_dir(char* dirname, Dir* cur_dir, Disk* disk);
 // auxiliary function for delete_dir
 int delete_dir_aux(Disk* disk, Dir* dir, int idx);
 
@@ -75,4 +75,4 @@ int dir_exists(char* dirname, Dir* cur_dir);
 FileHead* open_file(char* filename, Dir* cur_dir, Disk* disk);
 
 // prints the current directory
-void print_cur_dir();
+void print_cur_dir(Dir* cur_dir);

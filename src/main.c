@@ -8,16 +8,12 @@
 
 Dir* cur_dir = NULL;
 
-void print_cur_dir() {
-    printf("Current directory: %s\n", cur_dir->name);
-}
-
 int main (int argc, char** argv) {
     char* buffer = map_file("my_disk.img");
     Disk* disk = disk_init(buffer, 1);
     if (DEBUG)
         printf("Creating root directory...\n");
-    Dir* dir = create_dir(disk, NULL, "/");
+    Dir* dir = create_dir("/", NULL, disk);
     if (!dir)
         handle_error("error creating root directory");
     cur_dir = dir;
@@ -89,6 +85,7 @@ int main (int argc, char** argv) {
     if (DEBUG && ret != -1) {
         printf("Read %d bytes\n", ret);
     }
+    list_dir(cur_dir);
 
     // seek_in_file("test3.txt", 540, cur_dir, disk);
 
