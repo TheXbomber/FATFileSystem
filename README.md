@@ -1,7 +1,7 @@
 # FATFileSystem
 
 TODO:
-- Fix the shell
+- Fix storage
 
 IMPLEMENTED:
 - Create file

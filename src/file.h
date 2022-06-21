@@ -9,7 +9,7 @@ typedef struct {
 } FileHandle;
 
 typedef struct {
-    char* name;
+    char name[30];
     int is_dir;         // 0
     int size;
     // int free_in_block;  // free bytes in the current block
@@ -20,7 +20,7 @@ typedef struct {
 } FileHead;
 
 struct Dir {
-    char* name;
+    char name[30];
     int is_dir;         // 1
     Dir* parent_dir;
     int num_files;      // number of files
@@ -57,7 +57,7 @@ Dir* create_dir(char* dirname, Dir* parent_dir, Disk* disk);
 // deletes the directory dir and returns 0
 int delete_dir(char* dirname, Dir* cur_dir, Disk* disk);
 // auxiliary function for delete_dir
-int delete_dir_aux(Disk* disk, Dir* dir, int idx);
+int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx);
 
 // opens the dir directory and returns 0
 int change_dir(char* dirname, Dir** cur_dir);

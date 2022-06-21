@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon Jun 20 20:21:37 2022
+# Make data base, printed on Tue Jun 21 11:13:56 2022
 
 # Variables
 
@@ -24,8 +24,12 @@ DESKTOP_SESSION = ubuntu
 .SHELLFLAGS := -c
 # automatic
 ?F = $(notdir $?)
+# makefile (from 'Makefile', line 6)
+OBJ = disk.o fat.o file.o shell.o main.o
 # environment
 XDG_SESSION_CLASS = user
+# makefile (from 'Makefile', line 5)
+SRC = disk.c fat.c file.c shell.c
 # environment
 SNAP_COMMON = /var/snap/code/common
 # environment
@@ -45,7 +49,7 @@ GDMSESSION = ubuntu
 # environment
 XMODIFIERS = @im=ibus
 # makefile
-CURDIR := /home/alessandro/Desktop/FATFileSystem/FATFileSystem
+CURDIR := /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
 # makefile
 SHELL = /bin/sh
 # environment
@@ -55,15 +59,15 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:47739
+JOURNAL_STREAM = 8:47917
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
 SNAP_INSTANCE_NAME = code
 # environment
 SNAP_ARCH = amd64
-# makefile
-MAKEFILE_LIST := 
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
 # automatic
 @F = $(notdir $@)
 # environment
@@ -79,13 +83,13 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1640
+MANAGERPID = 1680
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
 LC_NAME = it_IT.UTF-8
 # environment
-VSCODE_CWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
+VSCODE_CWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
 # environment
 GSETTINGS_SCHEMA_DIR = /snap/code/99/usr/share/glib-2.0/schemas
 # default
@@ -95,7 +99,7 @@ PATH = /home/alessandro/.rvm/gems/ruby-3.1.1/bin:/home/alessandro/.rvm/gems/ruby
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1927,unix/sp7:/tmp/.ICE-unix/1927
+SESSION_MANAGER = local/sp7:@/tmp/.ICE-unix/1968,unix/sp7:/tmp/.ICE-unix/1968
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -113,7 +117,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 21db919b277c4ee5a2a50baca30a364d
+INVOCATION_ID = 03680af78f2f42ff898fd997719c9a97
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/99/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -135,13 +139,13 @@ SNAP_INSTANCE_KEY =
 # environment
 rvm_bin_path = /usr/share/rvm/bin
 # environment
-PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
+PWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem/src
 # default
 .LOADED := 
 # environment
 GEM_HOME = /home/alessandro/.rvm/gems/ruby-3.1.1
 # environment
-SSH_AGENT_PID = 1889
+SSH_AGENT_PID = 1930
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -166,6 +170,8 @@ SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd
 SNAP_CONTEXT = hrFHPZQPALxJc8mnRIaqRGxZOuuv-OkcPjcxEpH_dQvwOTp5y9e9
 # automatic
 +F = $(notdir $+)
+# makefile (from 'Makefile', line 4)
+HEADERS = error.h disk.h fat.h file.h
 # environment
 ELECTRON_NO_ATTACH_CONSOLE = 1
 # environment
@@ -196,10 +202,14 @@ IRBRC = /usr/share/rvm/rubies/ruby-3.1.1/.irbrc
 SNAP_USER_DATA = /home/alessandro/snap/code/99
 # environment
 SHLVL = 0
+# makefile (from 'Makefile', line 2)
+CCOPTS = -g -std=gnu99 -Wall
+# makefile (from 'Makefile', line 1)
+CC = gcc
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-cfaaf20d-2eb0-4eb7-b6b0-36ad4545ace8.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-46926641-2d94-4096-a023-5414a5a904d5.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -209,7 +219,7 @@ SNAP_REVISION = 99
 # environment
 LC_MONETARY = it_IT.UTF-8
 # makefile
-.DEFAULT_GOAL := 
+.DEFAULT_GOAL := shell
 # environment
 XDG_CURRENT_DESKTOP = Unity
 # environment
@@ -221,7 +231,7 @@ LC_TELEPHONE = it_IT.UTF-8
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/alessandro
+OLDPWD = /home/alessandro/Desktop/FATFileSystem/FATFileSystem
 # default
 .VARIABLES := 
 # automatic
@@ -256,12 +266,14 @@ LC_NUMERIC = it_IT.UTF-8
 LC_MEASUREMENT = it_IT.UTF-8
 # environment
 SNAP_NAME = code
+# makefile (from 'Makefile', line 7)
+BIN = shell main
 # environment
 LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/054754b2_6c4f_490e_b11f_f017b2895c80
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/aa7ed99a_7ed7_42db_b6b6_08e424a78c81
 # automatic
 ^F = $(notdir $^)
 # environment
@@ -277,6 +289,7 @@ CHROME_DESKTOP = code-url-handler.desktop
 # environment
 WINDOWPATH = 2
 # default
+ 
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
 GJS_DEBUG_OUTPUT = stderr
@@ -289,26 +302,29 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 3953
+VSCODE_PID = 8402
 # environment
 MY_RUBY_HOME = /usr/share/rvm/rubies/ruby-3.1.1
 # variable set hash-table stats:
-# Load=140/1024=14%, Rehash=0, Collisions=22/162=14%
+# Load=146/1024=14%, Rehash=0, Collisions=24/173=14%
 
 # Pattern-specific Variable Values
 
- 
 # No pattern-specific variable values.
 
 # Directories
 
-# . (device 66309, inode 598713): 7 files, no impossibilities.
+# . (device 66309, inode 598731): 15 files, no impossibilities.
 
-# 7 files, no impossibilities in 1 directories.
+# 15 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
-# No implicit rules.
+%.o: %.c error.h disk.h fat.h file.h
+#  recipe to execute (from 'Makefile', line 18):
+	$(CC) $(CCOPTS) -o $@ $<
+
+# 1 implicit rules, 0 (0.0%) terminal.
 
 # Files
 
@@ -319,19 +335,41 @@ all:
 #  File does not exist.
 #  File has not been updated.
 
+.PHONY: clean
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+main.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+fat.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+disk.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  File does not exist.
+#  Last modified 2022-06-20 17:27:32.817070595
 #  File has been updated.
-#  Failed to be updated.
+#  Successfully updated.
 
 # Not a target:
-makefile:
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
+shell.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 .DEFAULT:
@@ -339,27 +377,48 @@ makefile:
 #  Modification time never checked.
 #  File has not been updated.
 
-# Not a target:
-GNUmakefile:
-#  Implicit rule search has been done.
+clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
 #  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 21):
+	rm -rf *.o *~ $(OBJ) $(BIN) my_disk.img
+
+main: main.c disk.c fat.c file.c
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 15):
+	$(CC) $(CCOPTS) -o $@ $^
+
+# Not a target:
+file.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+shell: disk.c fat.c file.c shell.c
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 12):
+	$(CC) $(CCOPTS) -o $@ $^
 
 # files hash-table stats:
-# Load=6/1024=1%, Rehash=0, Collisions=0/15=0%
+# Load=13/1024=1%, Rehash=0, Collisions=1/33=3%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 15 / storage = 129 B / avg = 8 B
-# current buf: size = 8162 B / used = 129 B / count = 15 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 25 / storage = 184 B / avg = 7 B
+# current buf: size = 8162 B / used = 184 B / count = 25 / avg = 7 B
 
-# strcache performance: lookups = 18 / hit rate = 16%
+# strcache performance: lookups = 47 / hit rate = 46%
 # hash-table stats:
-# Load=15/8192=0%, Rehash=0, Collisions=1/18=6%
-# Finished Make data base on Mon Jun 20 20:21:37 2022
+# Load=25/8192=0%, Rehash=0, Collisions=4/47=9%
+# Finished Make data base on Tue Jun 21 11:13:56 2022
 
  
