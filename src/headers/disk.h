@@ -4,8 +4,11 @@
 #define BLOCK_SIZE 512
 #define DISK_SIZE 1048576
 
+typedef struct Dir Dir;
+
 typedef struct {
     int size;       // size of the disk array
+    Dir* cur_dir;   // pointer to current directory
     Fat* fat;       // pointer to start of the FAT
 } Disk;
 

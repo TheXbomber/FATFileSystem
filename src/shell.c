@@ -7,27 +7,45 @@
 //#include <stdlib.h>
 
 int main(int argc, char** argv) {
-    Dir* cur_dir = NULL;
+    Disk* disk;
     char* buffer = map_file("my_disk.img");
-    Disk* disk = disk_init(buffer, 1);
-    if (DEBUG)
-        printf("Creating root directory...\n");
-    Dir* dir = create_dir("/", NULL, disk);
-    if (!dir)
-        handle_error("error creating root directory");
-    cur_dir = dir;
-
-    // char* line = malloc(100);
-    // char** args = malloc(100*sizeof(char*));
-    // for (int i = 0; i < 100; i++)
-    //     args[i] = malloc(101);
-    // char* cmd = malloc(100);
-    // char* token = malloc(100);
+    if (buffer[0]) {
+        printf("Initialized disk found\n");
+        disk = (Disk*) buffer;
+        // printf("Size: %d\n", disk->size);
+        // disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
+        // disk->fat = (Fat*) (buffer + sizeof(Disk));
+        // printf("Free FAT blocks: %d\n", disk->fat->free_blocks);
+        // disk->fat->array = (FatEntry*) (disk->fat + sizeof(Fat));
+        
+        // for (int i = 0; disk->fat->array[i].idx < 256; i++) {
+        //     disk->fat->array[i].file = (File*) &disk->fat->array[i];
+        // }
+        // disk->cur_dir->parent_dir = (Dir*) disk + sizeof(disk->cur_dir->name) + sizeof(disk->cur_dir->is_dir);
+        // disk->cur_dir->dirs = (Dir**) (disk->cur_dir + sizeof(Dir) - sizeof(FileHead**));
+        // disk->cur_dir->files = (FileHead**) (disk->cur_dir->files + sizeof(Dir));
+        // for (int i = 0; i < disk->cur_dir->num_dirs; i++) {
+        //     disk->cur_dir->dirs[i] = (Dir*) disk->cur_dir + sizeof(Dir) - sizeof(FileHead**);
+        // }
+        // for (int i = 0; i < disk->cur_dir->num_files; i++) {
+        //     disk->cur_dir->files[i] = (FileHead*) disk->cur_dir + sizeof(Dir);
+        // }
+        
+        // printf("Idx: %d\n", disk->fat->array[1].idx);
+    } else {
+        disk = disk_init(buffer, 0);
+        if (DEBUG)
+            printf("Creating root directory...\n");
+        Dir* dir = create_dir("/", NULL, disk);
+        if (!dir)
+            handle_error("error creating root directory");
+        disk->cur_dir = dir;
+    }
 
     printf("*** FAT File System Shell ***\n");
     printf("Type \"help\" for a list of available commands\n");
     while(1) {
-        printf("%s> ", cur_dir->name);
+        printf("%s> ", disk->cur_dir->name);
         char cmd[100] = {};
         char args[100][100] = {};
         char c = (char) fgetc(stdin);
@@ -58,27 +76,6 @@ int main(int argc, char** argv) {
                 printf("arg%d: %s\n", j, args[j]);
         }
 
-        // // printf("cmd: %s\n", cmd);
-        // // printf("args:");
-        // // for (int i = 0; args && args[i]; i++) {
-        // //     printf(" %s", args[i]);
-        // // }
-        // // printf("\n");
-
-        // fgets(line, 100, stdin);
-        // printf("Line: %s\n", line);
-        // token = strtok(line, " \n");
-        // for (int i = 0; i < 5 && token != NULL; i++) {
-        //     if (i == 0) {
-        //         cmd = token;
-        //         printf("Cmd: %s\n", cmd);
-        //     } else {
-        //         args[i] = token;
-        //         printf("Arg%d: %s\n", i, args[i]);
-        //     }
-        //     token = strtok(NULL, " \n");
-        // }
-
         if (!strcmp(cmd, "help")) {
             // help function
             printf("Here's a list of all available commands:\n");
@@ -99,11 +96,11 @@ int main(int argc, char** argv) {
             printf("Exiting...\n");
             break;
         } else if (!strcmp(cmd, "touch")) {
-            create_file((char*) args[0], cur_dir, disk);
+            create_file((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "rm")) {
-            delete_file((char*) args[0], cur_dir, disk);
+            delete_file((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "rd")) {
-            read_file((char*) args[0], atoi(args[1]), atoi(args[2]), cur_dir, disk);
+            read_file((char*) args[0], atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "wr")) {
             printf("Input for write ('\\n' to confirm):\n");
             char buf[2048] = {};
@@ -112,33 +109,25 @@ int main(int argc, char** argv) {
                 buf[i] = cc;
                 cc = (char) fgetc(stdin);
             }
-            write_file(args[0], buf, atoi(args[1]), atoi(args[2]), cur_dir, disk);
+            write_file(args[0], buf, atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "seek")) {
-            seek_in_file((char*) args[0], atoi(args[1]), cur_dir, disk);
+            seek_in_file((char*) args[0], atoi(args[1]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "mkdir")) {
-            create_dir((char*) args[0], cur_dir, disk);
+            create_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "rmdir")) {
-            delete_dir((char*) args[0], cur_dir, disk);
+            delete_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "cd")) {
-            change_dir((char*) args[0], &cur_dir);
+            change_dir((char*) args[0], &disk->cur_dir);
         } else if (!strcmp(cmd, "ls")) {
-            list_dir(cur_dir);
+            list_dir(disk->cur_dir);
         } else if (!strcmp(cmd, "pwd")) {
-            print_cur_dir(cur_dir);
+            print_cur_dir(disk->cur_dir);
         } else if (!strcmp(cmd, "disk_print")) {
             disk_print(disk);
         } else {
             printf("Command \"%s\" not recognized!\n", cmd);
         }
     }
-
-    // free(line);
-    // free(token);
-    // free(cmd);
-    // for (int i = 0; i < 100; i++) {
-    //     free(args[i]);
-    // }
-    // free(args);
 
     return 0;
 }

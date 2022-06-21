@@ -256,13 +256,13 @@ int list_dir(Dir* dir) {
     printf("Content of %s:\n", dir->name);
     int i;
     int sum = 0;
-    printf("Dir\tName\t\t\tFiles/Size\tLocation:\n");
+    printf("Dir\tName\t\t\t\t\tFiles/Size\tLocation:\n");
     for (i = 0; i < dir->num_dirs; i++) {
-        printf("%d\t%s\t\t\t%d\t\t%p\n", dir->dirs[i]->is_dir, dir->dirs[i]->name, dir->dirs[i]->num_files, dir->dirs[i]);
+        printf("%d\t%s\t\t\t\t\t%d\t\t%p\n", dir->dirs[i]->is_dir, dir->dirs[i]->name, dir->dirs[i]->num_files, dir->dirs[i]);
     }
     sum += i;
     for (i = 0; i < dir->num_files; i++) {
-        printf("%d\t%s\t\t\t%d\t\t%p\n", dir->files[i]->is_dir, dir->files[i]->name, dir->files[i]->size, dir->files[i]);
+        printf("%d\t%s\t\t\t\t\t%d\t\t%p\n", dir->files[i]->is_dir, dir->files[i]->name, dir->files[i]->size, dir->files[i]);
     }
     sum += i;
     return sum;

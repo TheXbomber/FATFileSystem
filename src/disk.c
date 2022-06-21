@@ -47,6 +47,7 @@ Disk* disk_init(char* buffer, int format) {
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);
 
+    disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
     disk->fat = (Fat*) (buffer + sizeof(Disk));
     fat_init(disk->fat);
     //printf("First FAT: %p, %d, %d\n", disk->fat->array, disk->fat->array[0].data, disk->fat->array[0].busy);

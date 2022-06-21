@@ -5,10 +5,6 @@
 typedef struct Dir Dir;
 
 typedef struct {
-    int pos;            // current position in a file
-} FileHandle;
-
-typedef struct {
     char name[30];
     int is_dir;         // 0
     int size;
@@ -30,7 +26,7 @@ struct Dir {
     FileHead** files;   // list of files in directory
 };
 
-typedef struct File{
+typedef struct File {
     FatEntry* block;
     int free_in_block;
     char* data;

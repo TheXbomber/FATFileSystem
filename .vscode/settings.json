@@ -6,6 +6,7 @@
         "disk.h": "c",
         "fat.h": "c",
         "stdio.h": "c",
-        "file.h": "c"
+        "file.h": "c",
+        "mman.h": "c"
     }
 }
