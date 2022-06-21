@@ -1,7 +1,7 @@
-#include "error.h"
-#include "disk.h"
-#include "fat.h"
-#include "file.h"
+#include "headers/error.h"
+#include "headers/disk.h"
+#include "headers/fat.h"
+#include "headers/file.h"
 #include <stdio.h>
 #include <string.h>
 //#include <stdlib.h>
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
             printf(" - rm <filename> : delete a file\n");
             printf(" - rd <filename> <pos> <n> : read n bytes (0 for all) from a file starting from position pos (-1 for current)\n");
             printf(" - wr <filename> <pos> <n> : write n bytes (0 for all) in a file starting from position pos (-1 for current)\n");
-            printf(" - seek <filename> <pos> : change the current position of a file to pos\n");
+            printf(" - seek <filename> <pos> : change the current position of a file to pos (-1 for file end)\n");
             printf(" - mkdir <dirname> : create a directory\n");
             printf(" - rmdir <dirname> : delete a directory and all of its content\n");
             printf(" - cd <dirname> : open a directory\n");

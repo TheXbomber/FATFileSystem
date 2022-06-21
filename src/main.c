@@ -1,7 +1,7 @@
-#include "error.h"
-#include "disk.h"
-#include "fat.h"
-#include "file.h"
+#include "headers/error.h"
+#include "headers/disk.h"
+#include "headers/fat.h"
+#include "headers/file.h"
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>

@@ -1,6 +1,6 @@
-#include "error.h"
-#include "fat.h"
-#include "file.h"
+#include "headers/error.h"
+#include "headers/fat.h"
+#include "headers/file.h"
 #include <stdio.h>
 #include <sys/mman.h>
 #include <string.h>

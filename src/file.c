@@ -1,6 +1,6 @@
-#include "error.h"
-#include "file.h"
-#include "disk.h"
+#include "headers/error.h"
+#include "headers/file.h"
+#include "headers/disk.h"
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -324,6 +324,10 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
         printf("Unable to read file: file doesn't exist in the current directory!\n");
         return -1;
     }
+    if (n_bytes < 0) {
+        printf("Error: number of bytes is invalid!\n");
+        return -1;
+    }
 
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head)
@@ -332,10 +336,9 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
         printf("Error: position is invalid!\n");
         return -1;
     }
-    if (n_bytes < 0) {
-        printf("Error: number of bytes is invalid!\n");
-        return -1;
-    }
+
+    if(head->pos == -1)
+        head->pos = head->size;
 
     printf("Content of %s:\n", filename);
     int sum = 0;
@@ -395,22 +398,27 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
         }
         printf("\n");
     }
+    if (n_bytes < 0) {
+        printf("Error: number of bytes is invalid!\n");
+        return -1;
+    }
     int input_len = 0;
     for (int i = 0; buf[i]; i++)
         input_len++;
 
     FileHead* head = open_file(filename, cur_dir, disk);
-    if (!head)
-        handle_error("Error opening file");
+    if (!head && DEBUG) {
+        printf("Error opening file\n");
+        return -1;
+    }
+    if(head->pos == -1)
+        head->pos = head->size;
     //printf("Opened file with head %p\n", head);
     if (pos && (pos >= head->size || pos < -1)) {
         printf("Error: position is invalid!\n");
         return -1;
     }
-    if (n_bytes < 0) {
-        printf("Error: number of bytes is invalid!\n");
-        return -1;
-    }
+
     int sum = 0;    // sum of written bytes
     FatEntry* block = head->start;
     //printf("Head points to %p in the FAT\n", block);
@@ -569,7 +577,7 @@ int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
         handle_error("Error opening file");
 
     if (pos == -1)
-        file->pos = file->size;
+        file->pos = file->size-1;
     file->pos = pos;
 
     // FatEntry* block = file->start;

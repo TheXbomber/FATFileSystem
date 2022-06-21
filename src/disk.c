@@ -1,6 +1,6 @@
-#include "error.h"
-#include "disk.h"
-#include "file.h"
+#include "headers/error.h"
+#include "headers/disk.h"
+#include "headers/file.h"
 #include <stdio.h>
 #include <sys/mman.h>
 #include <string.h>

@@ -2,6 +2,10 @@
     "makefile.extensionOutputFolder": "./.vscode",
     "files.associations": {
         "fcntl.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "disk.h": "c",
+        "fat.h": "c",
+        "stdio.h": "c",
+        "file.h": "c"
     }
 }
