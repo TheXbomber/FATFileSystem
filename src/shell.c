@@ -4,7 +4,9 @@
 #include "headers/file.h"
 #include <stdio.h>
 #include <string.h>
-//#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
 int main(int argc, char** argv) {
     Disk* disk;
@@ -12,11 +14,12 @@ int main(int argc, char** argv) {
     if (buffer[0]) {
         printf("Initialized disk found\n");
         disk = (Disk*) buffer;
-        // printf("Size: %d\n", disk->size);
-        // disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
-        // disk->fat = (Fat*) (buffer + sizeof(Disk));
-        // printf("Free FAT blocks: %d\n", disk->fat->free_blocks);
-        // disk->fat->array = (FatEntry*) (disk->fat + sizeof(Fat));
+        printf("Size: %d\n", disk->size);
+        disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
+        printf("Cur dir: %s\n", disk->cur_dir->name);
+        printf("Free FAT blocks: %d\n", disk->fat.free_blocks);
+        disk->fat.array = (FatEntry*) (&disk->fat + sizeof(Fat));
+        printf("Array[1]: %d\n", disk->fat.array[1].busy);
         
         // for (int i = 0; disk->fat->array[i].idx < 256; i++) {
         //     disk->fat->array[i].file = (File*) &disk->fat->array[i];
@@ -32,8 +35,9 @@ int main(int argc, char** argv) {
         // }
         
         // printf("Idx: %d\n", disk->fat->array[1].idx);
+
     } else {
-        disk = disk_init(buffer, 0);
+        disk = disk_init(buffer, 1);
         if (DEBUG)
             printf("Creating root directory...\n");
         Dir* dir = create_dir("/", NULL, disk);
@@ -128,6 +132,8 @@ int main(int argc, char** argv) {
             printf("Command \"%s\" not recognized!\n", cmd);
         }
     }
+
+    munmap(buffer, DISK_SIZE);
 
     return 0;
 }

@@ -79,7 +79,7 @@ int create_file(char* filename, Dir* parent_dir, Disk* disk) {
     if (DEBUG) {
         int idx = head->start->data;
         printf("File %s created successfully\n", filename);
-        printf("Name: %s\tParent directory: %s\tSize: %d\tHead: %p\tData: %p\n", head->name, head->parent_dir->name, head->size, head->start->file, disk->fat->array[idx].file);
+        printf("Name: %s\tParent directory: %s\tSize: %d\tHead: %p\tData: %p\n", head->name, head->parent_dir->name, head->size, head->start->file, disk->fat.array[idx].file);
     }
 
     return 0;
@@ -164,22 +164,22 @@ int delete_file(char* filename, Dir* cur_dir, Disk* disk) {
     //printf("Cleaning head FAT data...\n");
     head->start->busy = 0;
     head->start->data = -1;
-    disk->fat->free_blocks++;
+    disk->fat.free_blocks++;
     //printf("Cleaning head disk data...\n");
     memset(head->start->file, 0, BLOCK_SIZE - sizeof(FileHead));
 
     // clean the other blocks
-    FatEntry* cur_fat_block = &disk->fat->array[entry_idx];
+    FatEntry* cur_fat_block = &disk->fat.array[entry_idx];
     for (int i = 0; cur_fat_block; i++) {
         next_entry_idx = cur_fat_block->data;
         //printf("Cleaning block FAT data...\n");
         cur_fat_block->busy = 0;
         cur_fat_block->data = -1;
-        disk->fat->free_blocks++;
+        disk->fat.free_blocks++;
         //printf("Cleaning block disk data...\n");
         memset(cur_fat_block->file, 0, BLOCK_SIZE - sizeof(File));
         if (next_entry_idx != -1)
-            cur_fat_block = &disk->fat->array[next_entry_idx];
+            cur_fat_block = &disk->fat.array[next_entry_idx];
         else
             break;
     }
@@ -246,7 +246,7 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx) {
     // we clean the directory's FAT data
     dir->start->busy = 0;
     dir->start->data = -1;
-    disk->fat->free_blocks++;
+    disk->fat.free_blocks++;
     // we clean the directory's disk data
     memset(dir, 0, BLOCK_SIZE - sizeof(Dir));
     return 0;
@@ -359,15 +359,15 @@ int read_file(char* filename, int pos, int n_bytes, Dir* cur_dir, Disk* disk) {
         if (sum == 0) {
             for (int i = 0; i < block_num; i++) {
                 idx = block->data;
-                block = &disk->fat->array[idx];
+                block = &disk->fat.array[idx];
             }
             idx = block->data;
             //printf("Reading from FAT %d\n", idx);
-            file = disk->fat->array[idx].file;
+            file = disk->fat.array[idx].file;
         } else {
             idx = next_idx;
             //printf("Reading from FAT %d\n", idx);
-            file = disk->fat->array[next_idx].file;
+            file = disk->fat.array[next_idx].file;
         }
         block = file->block;
         // read until the block is full
@@ -453,16 +453,16 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
         if (!sum) {
             for (int i = 0; i < block_num; i++) {
                 idx = block->data;
-                block = &disk->fat->array[idx];
+                block = &disk->fat.array[idx];
             }
             idx = block->data;
             //printf("Writing in FAT %d\n", idx);
-            file = disk->fat->array[idx].file;
+            file = disk->fat.array[idx].file;
             //printf("First iteration: file points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         } else {
             idx = next_idx;
             //printf("Writing in FAT %d\n", idx);
-            file = disk->fat->array[idx].file;
+            file = disk->fat.array[idx].file;
             //printf("File points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         }
         block = file->block;
@@ -559,7 +559,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, Dir* cur_dir, Di
             file->data = (char*) file + sizeof(File);
             block->file = file;
         } else {
-            block = &disk->fat->array[file->block->data];
+            block = &disk->fat.array[file->block->data];
             next_idx = block->idx;
         }
         block_offset = 0;
@@ -585,7 +585,7 @@ int seek_in_file(char* filename, int pos, Dir* cur_dir, Disk* disk) {
     // int block_offset = pos % (BLOCK_SIZE - sizeof(File));
     // for (int i = 0; i < block_num; i++) {
     //     int next_idx = block->data;
-    //     block = &disk->fat->array[next_idx];
+    //     block = &disk->fat.array[next_idx];
     // }
     // printf("Block number: %d\nBlock offset: %d\n", block_num, block_offset);
     // printf("Position in file %s: %d\n", filename, file->pos);
