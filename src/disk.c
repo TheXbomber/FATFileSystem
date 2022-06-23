@@ -42,14 +42,19 @@ Disk* disk_init(char* buffer, int format) {
     }
     
     Disk* disk = (Disk*) buffer;
-    int fatsize = FAT_SIZE;
-    disk->size = DISK_SIZE - sizeof(Disk) - fatsize;
+    if (format) {
+        // int fatsize = FAT_SIZE;
+        disk->size = DISK_SIZE - sizeof(Disk);
+    }
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);
 
-    disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
+    // disk->cur_dir = (Dir*) (buffer + sizeof(int) + sizeof(Dir*));
+    // disk->root_dir = (Dir*) (buffer + sizeof(int) + 2*sizeof(Dir*));
+    // disk->data = (char*) (buffer + sizeof(Disk));
     // disk->fat = (Fat*) (buffer + sizeof(Disk));
-    fat_init(&disk->fat);
+    if (format)
+        fat_init(&disk->fat);
     //printf("First FAT: %p, %d, %d\n", disk->fat.array, disk->fat.array[0].data, disk->fat.array[0].busy);
 
     if (DEBUG)
@@ -62,7 +67,7 @@ void disk_print(Disk* disk) {
     printf("----- DISK INFO -----\n");
     printf("--- FAT ---\nFree_blocks: %d\nContent:\n", disk->fat.free_blocks);
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
-        printf("Data: %d\tBusy: %d\tIdx: %d\tAddr: %p\n", disk->fat.array[i].data, disk->fat.array[i].busy, disk->fat.array[i].idx, &(disk->fat.array[i]));
+        printf("Data: %d\t\tBusy: %d\t\tIdx: %d\t\tDisk block idx: %d\t\tAddr: %p\n", disk->fat.array[i].data, disk->fat.array[i].busy, disk->fat.array[i].idx, disk->fat.array[i].file, &(disk->fat.array[i]));
     }
     printf("--- DISK ---\nDisk size: %d\n", disk->size);
     printf("----- END -----\n");
@@ -103,7 +108,7 @@ FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks) {
 }
 
 char* find_block(Disk* disk) {
-    char* start = (char*) (&disk->fat + FAT_SIZE);
+    char* start = disk->data;
     char* current = start;
     while (*current) {
         current += BLOCK_SIZE;
@@ -111,4 +116,14 @@ char* find_block(Disk* disk) {
     if (DEBUG)
         printf("Location on disk: %p\n", current);
     return current;
+}
+
+int get_block_idx(Disk* disk) {
+    int i = 0;
+    char* current = disk->data;
+    while (*current) {
+        current += BLOCK_SIZE;
+        i += BLOCK_SIZE;
+    }
+    return (i / BLOCK_SIZE) + 1;
 }

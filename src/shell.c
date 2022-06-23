@@ -13,13 +13,16 @@ int main(int argc, char** argv) {
     char* buffer = map_file("my_disk.img");
     if (buffer[0]) {
         printf("Initialized disk found\n");
-        disk = (Disk*) buffer;
-        printf("Size: %d\n", disk->size);
-        disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
-        printf("Cur dir: %s\n", disk->cur_dir->name);
-        printf("Free FAT blocks: %d\n", disk->fat.free_blocks);
-        disk->fat.array = (FatEntry*) (&disk->fat + sizeof(Fat));
-        printf("Array[1]: %d\n", disk->fat.array[1].busy);
+        // disk = (Disk*) buffer;
+        // printf("Size: %d\n", disk->size);
+        // disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
+        // disk->root_dir = (Dir*) (buffer + sizeof(disk->size) + sizeof(Dir*));
+        // printf("Cur dir: %s\n", disk->cur_dir->name);
+        // printf("Free FAT blocks: %d\n", disk->fat.free_blocks);
+        disk = disk_init(buffer, 0);
+        // disk->cur_dir = disk->root_dir;
+        // disk->fat.array = (FatEntry*) (&disk->fat + sizeof(Fat));
+        // printf("Array[1]: %d\n", disk->fat.array[1].busy);
         
         // for (int i = 0; disk->fat->array[i].idx < 256; i++) {
         //     disk->fat->array[i].file = (File*) &disk->fat->array[i];
@@ -40,16 +43,19 @@ int main(int argc, char** argv) {
         disk = disk_init(buffer, 1);
         if (DEBUG)
             printf("Creating root directory...\n");
-        Dir* dir = create_dir("/", NULL, disk);
+        Dir* dir = create_dir("/", 0, disk);
         if (!dir)
             handle_error("error creating root directory");
-        disk->cur_dir = dir;
+        disk->root_dir = dir->idx;
+        disk->cur_dir = disk->root_dir;
     }
 
     printf("*** FAT File System Shell ***\n");
     printf("Type \"help\" for a list of available commands\n");
     while(1) {
-        printf("%s> ", disk->cur_dir->name);
+        Dir* cur_dir_ptr = get_dir_ptr(disk->cur_dir, disk);
+        // printf("%s> ", cur_dir_ptr->name);
+        printf("> ");
         char cmd[100] = {};
         char args[100][100] = {};
         char c = (char) fgetc(stdin);
@@ -121,11 +127,11 @@ int main(int argc, char** argv) {
         } else if (!strcmp(cmd, "rmdir")) {
             delete_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "cd")) {
-            change_dir((char*) args[0], &disk->cur_dir);
+            change_dir((char*) args[0], &disk->cur_dir, disk);
         } else if (!strcmp(cmd, "ls")) {
-            list_dir(disk->cur_dir);
+            list_dir(disk->cur_dir, disk);
         } else if (!strcmp(cmd, "pwd")) {
-            print_cur_dir(disk->cur_dir);
+            print_cur_dir(disk->cur_dir, disk);
         } else if (!strcmp(cmd, "disk_print")) {
             disk_print(disk);
         } else {

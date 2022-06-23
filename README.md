@@ -1,9 +1,9 @@
 # FATFileSystem
 
 TODO:
-- Fix storage
+- Fix everything
 
-IMPLEMENTED:
+IMPLEMENTED:	(Everything needs fixing due to major refactoring!)
 - Create file
 - Create dir
 - Read file
