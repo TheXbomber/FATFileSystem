@@ -84,26 +84,48 @@ int main(int argc, char** argv) {
             printf("Exiting...\n");
             break;
         } else if (!strcmp(cmd, "touch")) {
-            create_file((char*) args[0], disk->cur_dir, disk);
+            if (!strcmp(args[0], ""))
+                printf("Usage: touch <filename>\n");
+            else
+                create_file((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "rm")) {
-            delete_file((char*) args[0], disk->cur_dir, disk);
+            if (!strcmp(args[0], ""))
+                printf("Usage: rm <filename>\n");
+            else
+                delete_file((char*) args[0], disk->cur_dir, 0, disk);
         } else if (!strcmp(cmd, "rd")) {
-            read_file((char*) args[0], atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
+            if (!strcmp(args[0], "") || !strcmp(args[1], "") || !strcmp(args[2], ""))
+                printf("Usage: rd <filename> <position> <number of bytes>\n");
+            else
+                read_file((char*) args[0], atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "wr")) {
-            printf("Input to write (ENTER to confirm):\n");
-            char buf[2048] = {};
-            char cc = (char) fgetc(stdin);
-            for (int i = 0; cc != '\n'; i++) {
-                buf[i] = cc;
-                cc = (char) fgetc(stdin);
+            if (!strcmp(args[0], "") || !strcmp(args[1], "") || !strcmp(args[2], ""))
+                printf("Usage: wr <filename> <position> <number of bytes>\n");
+            else {
+                printf("Input to write (ENTER to confirm):\n");
+                char buf[2048] = {};
+                char cc = (char) fgetc(stdin);
+                for (int i = 0; cc != '\n'; i++) {
+                    buf[i] = cc;
+                    cc = (char) fgetc(stdin);
+                }
+                write_file(args[0], buf, atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
             }
-            write_file(args[0], buf, atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "seek")) {
-            seek_in_file((char*) args[0], atoi(args[1]), disk->cur_dir, disk);
+            if (!strcmp(args[0], "") || !strcmp(args[1], ""))
+                printf("Usage: seek <filename> <position>\n");
+            else
+                seek_in_file((char*) args[0], atoi(args[1]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "mkdir")) {
-            create_dir((char*) args[0], disk->cur_dir, disk);
+            if (!strcmp(args[0], ""))
+                printf("Usage: mkdir <dirname>\n");
+            else
+                create_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "rmdir")) {
-            delete_dir((char*) args[0], disk->cur_dir, disk);
+            if (!strcmp(args[0], ""))
+                printf("Usage: rmdir <dirname>\n");
+            else
+                delete_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strcmp(cmd, "cd")) {
             change_dir((char*) args[0], &disk->cur_dir, disk);
         } else if (!strcmp(cmd, "ls")) {

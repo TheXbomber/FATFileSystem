@@ -207,7 +207,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     return new_dir;
 }
 
-int delete_file(char* filename, int cur_dir, Disk* disk) {
+int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     if (DEBUG)
         printf("Deleting file %s\n", filename);
 
@@ -272,7 +272,8 @@ int delete_file(char* filename, int cur_dir, Disk* disk) {
             break;
     }
     cur_dir_ptr->num_files--;
-    printf("File %s deleted succesfully\n", filename);
+    if (!sub)
+        printf("File %s deleted succesfully\n", filename);
     return 0;
 }
 
@@ -283,7 +284,6 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
     }
 
     Dir* to_delete;
-    int idx;
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     if (!cur_dir_ptr) {
         printf("Error getting current dir pointer\n");
@@ -296,12 +296,11 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
             return -1;
         }
         if (!strcmp(sub_dir_ptr->name, dirname) && sub_dir_ptr->is_dir) {
-            idx = 0;
             to_delete = sub_dir_ptr;
             break;
         }
     }
-    int ret = delete_dir_aux(disk, cur_dir_ptr, to_delete, idx);
+    int ret = delete_dir_aux(disk, cur_dir_ptr, to_delete);
     if (ret)
         handle_error("Error in delete_dir_aux!");
     cur_dir_ptr->num_dirs--;
@@ -309,42 +308,41 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
     return 0;
 }
 
-int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx) {
+int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
     int ret;
     if (dir->num_dirs) {
-        Dir* next_dir = get_dir_ptr(dir->files[idx], disk);
-        printf("Deleting subdirectory %s\n", next_dir->name);
-        int i = 1;
-        while (next_dir) {
-            if (next_dir->is_dir) {
-                next_dir = get_dir_ptr(dir->files[idx+i], disk);
-                if (!next_dir) {
-                    printf("Error getting next dir pointer\n");
-                    return -1;
-                }
-                break;
-            }
-            i++;
-        }
-        // we use a recursive call to delete the subdirectories
-        if (next_dir) {
-            ret = delete_dir_aux(disk, cur_dir, next_dir, idx);
-            if (ret)
-                handle_error("Error in delete_dir_aux!");
+        int i = 0;
+        int deleted = 0;
+        int tot_dirs = dir->num_dirs;
+        while (deleted < tot_dirs && dir->num_dirs + dir->num_files) {
+            Dir* next_dir = get_dir_ptr(dir->files[i], disk);
+            // we use a recursive call to delete the subdirectories
+            if (next_dir) {
+                ret = delete_dir_aux(disk, dir, next_dir);
+                deleted++;
+                if (ret)
+                    handle_error("Error in delete_dir_aux!");
+                // printf("Subdirectory %s deleted successfully\n", dir->name);
+            } else
+                i++;
         }
     }
+    // printf("Deleting subdirectory %s\n", dir->name);
     // we delete all files in the directory
-    for (int i = 0; i < dir->num_files + dir->num_dirs; i++) {
+    int i = 0;
+    int deleted = 0;
+    int tot_files = dir->num_files;
+    while (deleted < tot_files && i < dir->num_files + dir->num_dirs) {
         FileHead* file = get_file_head_ptr(dir->files[i], disk);
-        if (!file) {
-            printf("Error getting file head pointer\n");
-            return -1;
-        }
-        if (!file->is_dir) {
-            ret = delete_file(file->name, dir->idx, disk);
+        // int file_idx = file->idx;
+        if (file && !file->is_dir) {
+            // printf("Deleting file %s...\n", file->name);
+            ret = delete_file(file->name, dir->idx, 1, disk);
+            deleted++;
             if (ret)
                 handle_error("Error in delete_file!");
-        }
+        } else
+            i++;
     }
 
     // properly set the pointers to the other dirs to fill the hole

@@ -35,7 +35,7 @@ typedef struct File {
 int create_file(char* filename, int parent_dir, Disk* disk);
 
 // deletes the file filename and returns 0
-int delete_file(char* filename, int cur_dir, Disk* disk);
+int delete_file(char* filename, int cur_dir, int sub, Disk* disk);
 
 // reads the file filename from position pos (-1 for current position) and returns number of bytes read
 int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk);
@@ -52,7 +52,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk);
 // deletes the directory dir and returns 0
 int delete_dir(char* dirname, int cur_dir, Disk* disk);
 // auxiliary function for delete_dir
-int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx);
+int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir);
 
 // opens the dir directory and returns 0
 int change_dir(char* dirname, int* cur_dir, Disk* disk);
