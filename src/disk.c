@@ -33,14 +33,6 @@ Disk* disk_init(char* buffer, int format) {
             handle_error("error in disk_init -> memset for buffer");
     }
     
-    if (DEBUG) {
-        printf("BUFFER:\n");
-        for (int i = 0; buffer[i]; i++) {
-            printf("%c", buffer[i]);
-        }
-        printf("\nEND\n");
-    }
-    
     Disk* disk = (Disk*) buffer;
     if (format) {
         // int fatsize = FAT_SIZE;

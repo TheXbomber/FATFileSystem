@@ -259,6 +259,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
         cur_fat_block->data = -1;
         disk->fat.free_blocks++;
         if (DEBUG) printf("Cleaning block disk data...\n");
+        // printf("Getting file pointer for %d\n", cur_fat_block->file);
         File* file_ptr = get_file_ptr(cur_fat_block->file, disk);
         if (!file_ptr) {
             printf("Error: cannot retreive file pointer\n");
@@ -295,8 +296,9 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
             printf("Error getting subdir pointer\n");
             return -1;
         }
-        if (!strcmp(sub_dir_ptr->name, dirname) && sub_dir_ptr->is_dir) {
+        if (sub_dir_ptr->is_dir && !strcmp(sub_dir_ptr->name, dirname)){
             to_delete = sub_dir_ptr;
+            printf("To delete: %s\n", to_delete->name);
             break;
         }
     }
@@ -317,17 +319,18 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
         while (deleted < tot_dirs && dir->num_dirs + dir->num_files) {
             Dir* next_dir = get_dir_ptr(dir->files[i], disk);
             // we use a recursive call to delete the subdirectories
-            if (next_dir) {
+            if (next_dir && next_dir->is_dir) {
                 ret = delete_dir_aux(disk, dir, next_dir);
-                deleted++;
                 if (ret)
                     handle_error("Error in delete_dir_aux!");
+                deleted++;
                 // printf("Subdirectory %s deleted successfully\n", dir->name);
             } else
                 i++;
         }
     }
-    // printf("Deleting subdirectory %s\n", dir->name);
+    if (DEBUG)
+        printf("Deleting directory %s\n", dir->name);
     // we delete all files in the directory
     int i = 0;
     int deleted = 0;
@@ -336,7 +339,6 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
         FileHead* file = get_file_head_ptr(dir->files[i], disk);
         // int file_idx = file->idx;
         if (file && !file->is_dir) {
-            // printf("Deleting file %s...\n", file->name);
             ret = delete_file(file->name, dir->idx, 1, disk);
             deleted++;
             if (ret)
@@ -477,7 +479,7 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
         printf("Reading file %s\n", filename);
     // Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     if (!file_exists(filename, cur_dir, disk)) {
-        printf("Unable to read file: file doesn't exist in the current directory!\n");
+        printf("Unable to read file: %s doesn't exist in the current directory!\n", filename);
         return -1;
     }
     if (n_bytes < 0) {
@@ -549,6 +551,10 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
 }
 
 int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Disk* disk) {
+    if (!file_exists(filename, cur_dir, disk)) {
+        printf("Unable to write file: %s doesn't exist in the current directory!\n", filename);
+        return -1;
+    }
     if (DEBUG) {
         printf("Writing file %s\n", filename);
         printf("Input is:\n");
