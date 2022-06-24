@@ -13,7 +13,8 @@ int main(int argc, char** argv) {
     char* buffer;
     if (!access("my_disk.img", F_OK)) {
         buffer = map_file("my_disk.img");
-        printf("Initialized disk found\n");
+        if (DEBUG)
+            printf("Initialized disk found\n");
         disk = disk_init(buffer, 0);
     } else {
         buffer = map_file("my_disk.img");
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
         } else if (!strcmp(cmd, "rd")) {
             read_file((char*) args[0], atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
         } else if (!strcmp(cmd, "wr")) {
-            printf("Input for write ('\\n' to confirm):\n");
+            printf("Input to write (ENTER to confirm):\n");
             char buf[2048] = {};
             char cc = (char) fgetc(stdin);
             for (int i = 0; cc != '\n'; i++) {

@@ -9,8 +9,8 @@ IMPLEMENTED:
 - List dir
 - Change dir
 - Write file
-- Delete file (needs proper checking)
-- Delete dir (needs proper checking)
+- Delete file
+- Delete dir
 - Seek in file
 
 TO IMPLEMENT:

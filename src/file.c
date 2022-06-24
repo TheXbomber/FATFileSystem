@@ -497,12 +497,12 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
     File* file;
     int next_idx;
 
-    if (!n_bytes)
-        n_bytes = head->size;
     if (pos == -1)
         pos = head->pos;
-    int block_num = pos / (BLOCK_SIZE);
-    int block_offset = pos % (BLOCK_SIZE);
+    int block_num = pos / (BLOCK_SIZE - 2*sizeof(int));
+    int block_offset = pos % (BLOCK_SIZE - 2*sizeof(int));
+    if (!n_bytes)
+        n_bytes = head->size - pos;
 
     while (1) {
         int j = 0;
@@ -514,10 +514,12 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
             }
             idx = block->data;
             //printf("Reading from FAT %d\n", idx);
+            // printf("Getting file ptr for FAT block %d\n", disk->fat.array[idx].file);
             file = get_file_ptr(disk->fat.array[idx].file, disk);
         } else {
             idx = next_idx;
             //printf("Reading from FAT %d\n", idx);
+            // printf("Getting file ptr for FAT block %d\n", disk->fat.array[idx].file);
             file = get_file_ptr(disk->fat.array[next_idx].file, disk);
         }
         FatEntry* entry_ptr = get_fat_entry_ptr(file->idx, disk);
@@ -525,7 +527,7 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
         // read until the block is full
         if (DEBUG)
             printf("\nReading from block...\n");
-        while (sum < n_bytes && j < BLOCK_SIZE) { // (- sizeof(File))
+        while (sum < n_bytes && j < BLOCK_SIZE - 2*sizeof(int)) {
             printf("%c", file->data[j + block_offset]);
             j++;
             sum++;
@@ -589,8 +591,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         n_bytes = input_len;
     if (pos == -1)
         pos = head->pos;
-    int block_num = pos / (BLOCK_SIZE);
-    int block_offset = pos % (BLOCK_SIZE);
+    int block_num = pos / (BLOCK_SIZE - 2*sizeof(int));
+    int block_offset = pos % (BLOCK_SIZE - 2*sizeof(int));
+
+    // printf("To write: %d bytes\n", n_bytes);
 
     while (1) {
         int j = 0;
@@ -622,14 +626,20 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         block = entry_ptr;
         // write until the block is full
         if (DEBUG)
-            printf("Writing in block (file: %s\taddress: %p\tdata: %p)...\n", head->name, file, file->data);
+            printf("Writing in block (file: %s\taddress: %p\tidx: %d\tdata: %p)...\n", head->name, file, file->idx, file->data);
         //printf("Free bytes in block: %d\n", file->free_in_block);
-        char* block_end = file->data + BLOCK_SIZE; // (- sizeof(File))
+        char* block_end = file->data + sizeof(file->data);
+        // printf("Block size: %ld\n", sizeof(file->data));
+        // printf("j: %d\toffset: %d\n", j, block_offset);
+        // printf("Comparing: %p %p\n", &file->data[j + block_offset], block_end);
+        // printf("COND: %d\n", &file->data[j + block_offset] < block_end);
         while (sum < n_bytes && &file->data[j + block_offset] < block_end) {
             int override = 0;
-            if (file->data[j + block_offset])
+            if (file->data[j + block_offset]) {
                 override = 1;
+            }
             file->data[j + block_offset] = buf[buf_pos];
+            if (DEBUG) printf("%c", file->data[j + block_offset]);
             j++;
             buf_pos++;
             sum++;
@@ -638,21 +648,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
             if (file->free_in_block) {
                 file->free_in_block--;
             }
-            // if (!leftover_inserted) {
-            //     buf_pos++;
-            //     head->size++;
-            //     sum++;
-            // } else {
-            //     leftover_inserted = 0;
-            //     j = shift_start;
-            //     file = shift_start_file;
-            //     printf("Back to file %p\n", file);
-            //     continue;
-            // }
             if (!override && !file->free_in_block)
                 break;
         }
-        // printf("\n");
+        if (DEBUG) printf("\n");
         //printf("Written %d bytes\n", sum);
         // if we are done we exit
         if (sum == n_bytes)
@@ -667,8 +666,9 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
             prev_block->data = block->idx;
             next_idx = block->idx;
             file = (File*) find_block(disk);
-            file->idx = block->idx;
-            file->free_in_block = BLOCK_SIZE; // (- sizeof(File))
+            file->idx = get_block_idx(disk);
+            block->file = file->idx;
+            file->free_in_block = BLOCK_SIZE - 2*sizeof(int);
             block->file = file->idx;
         } else {
             block = &disk->fat.array[entry_ptr->data];
