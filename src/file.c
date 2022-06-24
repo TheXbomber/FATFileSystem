@@ -195,7 +195,8 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         }
     }
 
-    printf("Directory %s created successfully\n", dirname);
+    if (strcmp("/", dirname))
+        printf("Directory %s created successfully\n", dirname);
     if (DEBUG) {
         if (parent_dir)
             printf("Name: %s\t Parent dir: %s\tFiles: %d\tIndex: %d\tFAT block idx: %d\n", new_dir->name, parent_dir_ptr->name, new_dir->num_files, new_dir->idx, new_dir->start);
@@ -426,6 +427,12 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
         *cur_dir = parent_dir_ptr->idx;
         if (DEBUG)
             printf("Switched current directory to %s\n", parent_dir_ptr->name);
+        return 0;
+    }
+    if (!strcmp(dirname, "")) {
+        *cur_dir = disk->root_dir;
+        if (DEBUG)
+            printf("Switched current directory to %s\n", cur_dir_ptr->name);
         return 0;
     }
     if (!dir_exists(dirname, *cur_dir, disk)) {

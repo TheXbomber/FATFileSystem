@@ -6,14 +6,14 @@
 typedef struct File File;
 
 typedef struct {
-    int file;
+    int file;               // index of the disk block
     int data;               // index of next block
     int busy;               // 0 if the block is free
-    int idx;
+    int idx;                // index of this block
 } FatEntry;
 
 typedef struct {
-    int free_blocks;        // number of free blocks
+    int free_blocks;                        // number of free blocks
     FatEntry array[FAT_BLOCKS_MAX];        // FAT
 } Fat;
 

@@ -9,11 +9,9 @@ typedef struct {
     char name[30];
     int is_dir;         // 0
     int size;
-    // int free_in_block;  // free bytes in the current block
     int pos;            // current position in the file
     int parent_dir;    // directory that stores the file
     int start;    // pointer to first block of file
-    //char* data;
 } FileHead;
 
 struct Dir {
@@ -74,10 +72,14 @@ FileHead* open_file(char* filename, int cur_dir, Disk* disk);
 // prints the current directory
 void print_cur_dir(int cur_dir, Disk* disk);
 
+// returns the pointer to the FAT block relative to the disk block with index idx
 FatEntry* get_fat_entry_ptr(int idx, Disk* disk);
 
+// returns the pointer to the file header relative to the disk block with index idx
 FileHead* get_file_head_ptr(int idx, Disk* disk);
 
+// returns the pointer to the disk block with index idx
 File* get_file_ptr(int idx, Disk* disk);
 
+// returns the pointer to the directory relative to the disk block with index idx
 Dir* get_dir_ptr(int idx, Disk* disk);
