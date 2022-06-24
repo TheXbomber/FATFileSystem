@@ -6,12 +6,13 @@
 #include <string.h>
 
 FatEntry* get_fat_entry_ptr(int idx, Disk* disk) {
-    // FatEntry* entry_ptr;
+    FatEntry* entry_ptr;
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
         if (idx == disk->fat.array[i].file) {;
+            entry_ptr = &disk->fat.array[i];
             // if (DEBUG)
             //     printf("FAT entry pointer found at %p\n", &disk->fat.array[i]);
-            return &disk->fat.array[i];
+            return entry_ptr;
         }
     }
     return NULL;
@@ -19,7 +20,7 @@ FatEntry* get_fat_entry_ptr(int idx, Disk* disk) {
 
 FileHead* get_file_head_ptr(int idx, Disk* disk) {
     FileHead* file_ptr;
-    for (int i = 0; disk->data[i]; i += BLOCK_SIZE) {
+    for (int i = 0; i < disk->size; i += BLOCK_SIZE) {
         int cur_idx = (int) disk->data[i];
         if (cur_idx == idx) {
             file_ptr = (FileHead*) &disk->data[i];
@@ -33,7 +34,7 @@ FileHead* get_file_head_ptr(int idx, Disk* disk) {
 
 File* get_file_ptr(int idx, Disk* disk) {
     File* file_ptr;
-    for (int i = 0; disk->data[i]; i += BLOCK_SIZE) {
+    for (int i = 0; i < disk->size; i += BLOCK_SIZE) {
         int cur_idx = (int) disk->data[i];
         if (cur_idx == idx) {
             file_ptr = (File*) &disk->data[i];
@@ -47,7 +48,7 @@ File* get_file_ptr(int idx, Disk* disk) {
 
 Dir* get_dir_ptr(int idx, Disk* disk) {
     Dir* cur_dir_ptr;
-    for (int i = 0; disk->data[i]; i += BLOCK_SIZE) {
+    for (int i = 0; i < disk->size; i += BLOCK_SIZE) {
         int cur_idx = (int) disk->data[i];
         if (cur_idx == idx) {
             cur_dir_ptr = (Dir*) &disk->data[i];
@@ -178,6 +179,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     new_dir->parent_dir = parent_dir;
     new_dir->num_files = 0;
     new_dir->num_dirs = 0;
+    start_block->file = new_dir->idx;
     // new_dir->dirs = (Dir**) (new_dir + sizeof(Dir) - sizeof(FileHead**));
     // new_dir->files = (FileHead**) (new_dir + sizeof(Dir));
 
@@ -218,15 +220,16 @@ int delete_file(char* filename, int cur_dir, Disk* disk) {
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs - 1; i++) {
         FileHead* file = get_file_head_ptr(cur_dir_ptr->files[i], disk);
-        if (!strcmp(file->name, filename)) {
-            printf("Found file\n");
+        if (!strcmp(file->name, filename) && !file->is_dir) {
+            // printf("Found file\n");
             cur_dir_ptr->files[i] = 0;
         } else
             continue;
-        if (!cur_dir_ptr->files[i]) {
-            printf("Shifting file pointer...\n");
+        while (!cur_dir_ptr->files[i] && i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs - 1) {
+            // printf("Shifting file pointer...\n");
             cur_dir_ptr->files[i] = cur_dir_ptr->files[i+1];
             cur_dir_ptr->files[i+1] = 0;
+            i++;
         }
     }
     
@@ -235,11 +238,12 @@ int delete_file(char* filename, int cur_dir, Disk* disk) {
     int entry_idx = entry->data;
     int next_entry_idx;
     //printf("Cleaning head FAT data...\n");
+    entry->file = 0;
     entry->busy = 0;
     entry->data = -1;
     disk->fat.free_blocks++;
     //printf("Cleaning head disk data...\n");
-    memset(head, 0, BLOCK_SIZE);
+    memset(head, 0, sizeof(FileHead));
 
     // clean the other blocks
     FatEntry* cur_fat_block = &disk->fat.array[entry_idx];
@@ -249,24 +253,24 @@ int delete_file(char* filename, int cur_dir, Disk* disk) {
     }
     for (int i = 0; cur_fat_block; i++) {
         next_entry_idx = cur_fat_block->data;
-        printf("Cleaning block FAT data...\n");
+        if (DEBUG) printf("Cleaning block FAT data...\n");
+        cur_fat_block->file = 0;
         cur_fat_block->busy = 0;
         cur_fat_block->data = -1;
         disk->fat.free_blocks++;
-        printf("Cleaning block disk data...\n");
+        if (DEBUG) printf("Cleaning block disk data...\n");
         File* file_ptr = get_file_ptr(cur_fat_block->file, disk);
         if (!file_ptr) {
-            printf("Error: cannot retreive file pointer\n"); // <---
+            printf("Error: cannot retreive file pointer\n");
             return -1;
         }
-        memset(file_ptr, 0, BLOCK_SIZE); // (- sizeof(File))
+        memset(file_ptr, 0, sizeof(File));
         if (next_entry_idx != -1)
             cur_fat_block = &disk->fat.array[next_entry_idx];
         else
             break;
     }
     cur_dir_ptr->num_files--;
-
     printf("File %s deleted succesfully\n", filename);
     return 0;
 }
@@ -280,10 +284,18 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
     Dir* to_delete;
     int idx;
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
+    if (!cur_dir_ptr) {
+        printf("Error getting current dir pointer\n");
+        return -1;
+    }
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* sub_dir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);
+        if (!sub_dir_ptr) {
+            printf("Error getting subdir pointer\n");
+            return -1;
+        }
         if (!strcmp(sub_dir_ptr->name, dirname) && sub_dir_ptr->is_dir) {
-            idx = i;
+            idx = 0;
             to_delete = sub_dir_ptr;
             break;
         }
@@ -298,24 +310,35 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
 
 int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx) {
     int ret;
-    Dir* next_dir = get_dir_ptr(dir->files[idx], disk);
-    int i = 1;
-    while (next_dir) {
-        if (next_dir->is_dir) {
-            next_dir = get_dir_ptr(dir->files[idx+i], disk);
-            break;
+    if (dir->num_dirs) {
+        Dir* next_dir = get_dir_ptr(dir->files[idx], disk);
+        printf("Deleting subdirectory %s\n", next_dir->name);
+        int i = 1;
+        while (next_dir) {
+            if (next_dir->is_dir) {
+                next_dir = get_dir_ptr(dir->files[idx+i], disk);
+                if (!next_dir) {
+                    printf("Error getting next dir pointer\n");
+                    return -1;
+                }
+                break;
+            }
+            i++;
         }
-        i++;
-    }
-    // we use a recursive call to delete the subdirectories
-    if (next_dir) {
-        ret = delete_dir_aux(disk, cur_dir, next_dir, idx);
-        if (ret)
-            handle_error("Error in delete_dir_aux!");
+        // we use a recursive call to delete the subdirectories
+        if (next_dir) {
+            ret = delete_dir_aux(disk, cur_dir, next_dir, idx);
+            if (ret)
+                handle_error("Error in delete_dir_aux!");
+        }
     }
     // we delete all files in the directory
     for (int i = 0; i < dir->num_files + dir->num_dirs; i++) {
         FileHead* file = get_file_head_ptr(dir->files[i], disk);
+        if (!file) {
+            printf("Error getting file head pointer\n");
+            return -1;
+        }
         if (!file->is_dir) {
             ret = delete_file(file->name, dir->idx, disk);
             if (ret)
@@ -326,23 +349,26 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx) {
     // properly set the pointers to the other dirs to fill the hole
     for (int i = 0; i < cur_dir->num_dirs + cur_dir->num_files - 1; i++) {
         if (cur_dir->files[i] == dir->idx) {
-            printf("Found dir\n");
+            // printf("Found dir\n");
             cur_dir->files[i] = 0;
         } else
             continue;
-        if (!cur_dir->files[i]) {
-            printf("Shifting dir pointer...\n");
+        while (!cur_dir->files[i] && i < cur_dir->num_dirs + cur_dir->num_files - 1) {
+            // printf("Shifting dir pointer...\n");
             cur_dir->files[i] = cur_dir->files[i+1];
             cur_dir->files[i+1] = 0;
+            i++;
         }
     }
 
     // we clean the directory's FAT data
+    // printf("Getting FAT entry pointer for dir idx: %d\n", dir->idx);
     FatEntry* entry = get_fat_entry_ptr(dir->idx, disk);      // < ---
     if (!entry) {
         printf("Error getting FAT block idx!\n");
         return -1;
     }
+    entry->file = 0;
     entry->busy = 0;
     entry->data = -1;
     disk->fat.free_blocks++;
@@ -353,22 +379,37 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir, int idx) {
 
 int list_dir(int dir, Disk* disk) {
     Dir* dir_ptr = get_dir_ptr(dir, disk);
+    if (!dir_ptr) {
+            printf("Error getting dir pointer\n");
+            return -1;
+        }
     printf("Content of %s:\n", dir_ptr->name);
     int i;
     int sum = 0;
     printf("Dir\tName\t\t\t\t\tFiles/Size\tBlock index:\n");
     for (i = 0; i < dir_ptr->num_dirs + dir_ptr->num_files; i++) {
+        // printf("Getting subdir pointer to %d\n", dir_ptr->files[i]);
         Dir* subdir_ptr = get_dir_ptr(dir_ptr->files[i], disk);
-        if (subdir_ptr->is_dir)
+        if (!subdir_ptr) {
+            printf("Error getting subdir pointer\n");
+            return -1;
+        }
+        if (subdir_ptr->is_dir) {
             printf("%d\t%s\t\t\t\t\t%d\t\t%d\n", subdir_ptr->is_dir, subdir_ptr->name, subdir_ptr->num_files, subdir_ptr->idx);
+            sum++;
+        }
     }
-    sum += i;
     for (i = 0; i < dir_ptr->num_files + dir_ptr->num_dirs; i++) {
         FileHead* file_ptr = get_file_head_ptr(dir_ptr->files[i], disk);
-        if (!file_ptr->is_dir)
+        if (!file_ptr) {
+            printf("Error getting file head pointer\n");
+            return -1;
+        }
+        if (!file_ptr->is_dir) {
             printf("%d\t%s\t\t\t\t\t%d\t\t%d\n", file_ptr->is_dir, file_ptr->name, file_ptr->size, file_ptr->idx);
+            sum++;
+        }
     }
-    sum += i;
     return sum;
 }
 
@@ -378,7 +419,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
     Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
     if (!strcmp(dirname, "..")) {
         Dir* parent_dir_ptr = get_dir_ptr(cur_dir_ptr->parent_dir, disk);
-        if (!parent_dir_ptr) {
+        if (!cur_dir_ptr->parent_dir) {
             printf("Unable to open directory: root has no parent directory!\n");
             return -1;
         }
@@ -636,6 +677,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         }
         block_offset = 0;
     }
+    printf("Successfully written %d bytes in %s\n", sum, filename);
     return sum;
 }
 

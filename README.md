@@ -1,9 +1,9 @@
 # FATFileSystem
 
 TODO:
-- Fix everything
+- Fix file blocks not being currently emptied when deleting files
 
-IMPLEMENTED:	(Everything needs fixing due to major refactoring!)
+IMPLEMENTED:
 - Create file
 - Create dir
 - Read file

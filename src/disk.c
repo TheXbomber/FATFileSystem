@@ -44,7 +44,7 @@ Disk* disk_init(char* buffer, int format) {
     Disk* disk = (Disk*) buffer;
     if (format) {
         // int fatsize = FAT_SIZE;
-        disk->size = DISK_SIZE - sizeof(Disk);
+        disk->size = DISK_SIZE - 3*sizeof(int) - sizeof(Fat);
     }
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);

@@ -10,36 +10,13 @@
 
 int main(int argc, char** argv) {
     Disk* disk;
-    char* buffer = map_file("my_disk.img");
-    if (buffer[0]) {
+    char* buffer;
+    if (!access("my_disk.img", F_OK)) {
+        buffer = map_file("my_disk.img");
         printf("Initialized disk found\n");
-        // disk = (Disk*) buffer;
-        // printf("Size: %d\n", disk->size);
-        // disk->cur_dir = (Dir*) (buffer + sizeof(disk->size));
-        // disk->root_dir = (Dir*) (buffer + sizeof(disk->size) + sizeof(Dir*));
-        // printf("Cur dir: %s\n", disk->cur_dir->name);
-        // printf("Free FAT blocks: %d\n", disk->fat.free_blocks);
         disk = disk_init(buffer, 0);
-        // disk->cur_dir = disk->root_dir;
-        // disk->fat.array = (FatEntry*) (&disk->fat + sizeof(Fat));
-        // printf("Array[1]: %d\n", disk->fat.array[1].busy);
-        
-        // for (int i = 0; disk->fat->array[i].idx < 256; i++) {
-        //     disk->fat->array[i].file = (File*) &disk->fat->array[i];
-        // }
-        // disk->cur_dir->parent_dir = (Dir*) disk + sizeof(disk->cur_dir->name) + sizeof(disk->cur_dir->is_dir);
-        // disk->cur_dir->dirs = (Dir**) (disk->cur_dir + sizeof(Dir) - sizeof(FileHead**));
-        // disk->cur_dir->files = (FileHead**) (disk->cur_dir->files + sizeof(Dir));
-        // for (int i = 0; i < disk->cur_dir->num_dirs; i++) {
-        //     disk->cur_dir->dirs[i] = (Dir*) disk->cur_dir + sizeof(Dir) - sizeof(FileHead**);
-        // }
-        // for (int i = 0; i < disk->cur_dir->num_files; i++) {
-        //     disk->cur_dir->files[i] = (FileHead*) disk->cur_dir + sizeof(Dir);
-        // }
-        
-        // printf("Idx: %d\n", disk->fat->array[1].idx);
-
     } else {
+        buffer = map_file("my_disk.img");
         disk = disk_init(buffer, 1);
         if (DEBUG)
             printf("Creating root directory...\n");
@@ -54,8 +31,8 @@ int main(int argc, char** argv) {
     printf("Type \"help\" for a list of available commands\n");
     while(1) {
         Dir* cur_dir_ptr = get_dir_ptr(disk->cur_dir, disk);
-        // printf("%s> ", cur_dir_ptr->name);
-        printf("> ");
+        printf("%s> ", cur_dir_ptr->name);
+        // printf("> ");
         char cmd[100] = {};
         char args[100][100] = {};
         char c = (char) fgetc(stdin);
