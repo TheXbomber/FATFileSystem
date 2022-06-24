@@ -254,7 +254,6 @@ int delete_file(char* filename, int cur_dir, Disk* disk) {
     for (int i = 0; cur_fat_block; i++) {
         next_entry_idx = cur_fat_block->data;
         if (DEBUG) printf("Cleaning block FAT data...\n");
-        cur_fat_block->file = 0;
         cur_fat_block->busy = 0;
         cur_fat_block->data = -1;
         disk->fat.free_blocks++;
@@ -264,6 +263,7 @@ int delete_file(char* filename, int cur_dir, Disk* disk) {
             printf("Error: cannot retreive file pointer\n");
             return -1;
         }
+        cur_fat_block->file = 0;
         memset(file_ptr, 0, sizeof(File));
         if (next_entry_idx != -1)
             cur_fat_block = &disk->fat.array[next_entry_idx];

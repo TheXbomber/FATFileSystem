@@ -1,7 +1,6 @@
 # FATFileSystem
 
 TODO:
-- Fix file blocks not being currently emptied when deleting files
 
 IMPLEMENTED:
 - Create file
