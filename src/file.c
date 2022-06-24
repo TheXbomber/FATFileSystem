@@ -138,9 +138,9 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     block->file = file->idx;
     //printf("block->file: %p %p free: %d\n", block->file, *block->file, (*block->file)->free_in_block);
 
+    printf("File %s created successfully\n", filename);
     if (DEBUG) {
         // int index = head->start->data;
-        printf("File %s created successfully\n", filename);
         printf("Name: %s\tParent directory: %s\tSize: %d\tIndex: %d\tFAT idx: %d\n", head->name, parent_dir_ptr->name, head->size, head->idx, head->start);
     }
 
@@ -195,8 +195,8 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         }
     }
 
+    printf("Directory %s created successfully\n", dirname);
     if (DEBUG) {
-        printf("Directory %s created successfully\n", dirname);
         if (parent_dir)
             printf("Name: %s\t Parent dir: %s\tFiles: %d\tIndex: %d\tFAT block idx: %d\n", new_dir->name, parent_dir_ptr->name, new_dir->num_files, new_dir->idx, new_dir->start);
         else
@@ -618,7 +618,6 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
             }
             //printf("File points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         }
-        printf("Getting FAT entry ptr for block %d\n", file->idx);
         FatEntry* entry_ptr = get_fat_entry_ptr(file->idx, disk);
         block = entry_ptr;
         // write until the block is full
@@ -693,18 +692,10 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
     if (pos == -1)
         file->pos = file->size-1;
     file->pos = pos;
-
-    // FatEntry* block = file->start;
-    // int block_num = pos / (BLOCK_SIZE - sizeof(File));
-    // int block_offset = pos % (BLOCK_SIZE - sizeof(File));
-    // for (int i = 0; i < block_num; i++) {
-    //     int next_idx = block->data;
-    //     block = &disk->fat.array[next_idx];
-    // }
-    // printf("Block number: %d\nBlock offset: %d\n", block_num, block_offset);
-    // printf("Position in file %s: %d\n", filename, file->pos);
-    // return block->file->data + block_offset;
-    printf("Current position in file '%s': %d\n", filename, file->pos);
+    if (file->pos == -1)
+        printf("Current position in file '%s': end\n", filename);
+    else
+        printf("Current position in file '%s': %d\n", filename, file->pos);
     return file->pos;
 }
 
