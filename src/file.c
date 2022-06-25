@@ -65,7 +65,7 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
     for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs; i++) {
         FileHead* file_ptr = get_file_head_ptr(cur_dir_ptr->files[i], disk);
         // printf("Comparing %s : %s\n", file_ptr->name, filename);
-        if (!strcmp(file_ptr->name, filename) && !file_ptr->is_dir) {
+        if (!strncmp(file_ptr->name, filename, 30) && !file_ptr->is_dir) {
             return 1;
         }
     }
@@ -76,7 +76,7 @@ int dir_exists(char* dirname, int cur_dir, Disk* disk) {
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* subdir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);
-        if (!strcmp(subdir_ptr->name, dirname) && subdir_ptr->is_dir) {
+        if (!strncmp(subdir_ptr->name, dirname, 30) && subdir_ptr->is_dir) {
             return 1;
         }
     }
@@ -90,6 +90,10 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
 
     if (DEBUG)
         printf("Creating file %s...\n", filename);
+    if (strlen(filename) > 30) {
+        printf("Unable to create file: file name lenght cannot exceed 30 characters!\n");
+        return -1;
+    }
     if (file_exists(filename, parent_dir, disk)) {
         printf("Unable to create file: file already exists!\n");
         return -1;
@@ -150,6 +154,10 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
 Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     if (DEBUG)
         printf("Creating directory %s...\n", dirname);
+    if (strlen(dirname) > 30) {
+        printf("Unable to create directory: directory name lenght cannot exceed 30 characters!\n");
+    return NULL;
+    }
     if (parent_dir && dir_exists(dirname, parent_dir, disk)) {
         printf("Unable to create direcotry: directory already exists!\n");
         return NULL;
@@ -195,7 +203,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         }
     }
 
-    if (strcmp("/", dirname))
+    if (strncmp("/", dirname, 1))
         printf("Directory %s created successfully\n", dirname);
     if (DEBUG) {
         if (parent_dir)
@@ -221,7 +229,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs - 1; i++) {
         FileHead* file = get_file_head_ptr(cur_dir_ptr->files[i], disk);
-        if (!strcmp(file->name, filename) && !file->is_dir) {
+        if (!strncmp(file->name, filename, 30) && !file->is_dir) {
             // printf("Found file\n");
             cur_dir_ptr->files[i] = 0;
         } else
@@ -296,7 +304,7 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
             printf("Error getting subdir pointer\n");
             return -1;
         }
-        if (sub_dir_ptr->is_dir && !strcmp(sub_dir_ptr->name, dirname)){
+        if (sub_dir_ptr->is_dir && !strncmp(sub_dir_ptr->name, dirname, 30)){
             to_delete = sub_dir_ptr;
             // printf("To delete: %s\n", to_delete->name);
             break;
@@ -418,7 +426,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
     if (DEBUG)
         printf("Opening directory %s ...\n", dirname);
     Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
-    if (!strcmp(dirname, "..")) {
+    if (!strncmp(dirname, "..", 1)) {
         Dir* parent_dir_ptr = get_dir_ptr(cur_dir_ptr->parent_dir, disk);
         if (!cur_dir_ptr->parent_dir) {
             printf("Unable to open directory: root has no parent directory!\n");
@@ -429,7 +437,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
             printf("Switched current directory to %s\n", parent_dir_ptr->name);
         return 0;
     }
-    if (!strcmp(dirname, "")) {
+    if (!strncmp(dirname, "", 1)) {
         *cur_dir = disk->root_dir;
         if (DEBUG)
             printf("Switched current directory to %s\n", cur_dir_ptr->name);
@@ -441,7 +449,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
     }
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* subdir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);
-        if (!strcmp(dirname, subdir_ptr->name) && subdir_ptr->is_dir) {
+        if (!strncmp(dirname, subdir_ptr->name, 30) && subdir_ptr->is_dir) {
             *cur_dir = subdir_ptr->idx;
             cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
             if (DEBUG)
@@ -466,7 +474,7 @@ FileHead* open_file(char* filename, int cur_dir, Disk* disk) {
     for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs; i++) {
         head = get_file_head_ptr(cur_dir_ptr->files[i], disk);
         name = head->name;
-        if (!strcmp(filename, name)) {
+        if (!strncmp(filename, name, 30)) {
             return head;
         }
     }

@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
                 printf("arg%d: %s\n", j, args[j]);
         }
 
-        if (!strcmp(cmd, "help")) {
+        if (!strncmp(cmd, "help", 4)) {
             // help function
             printf("Here's a list of all available commands:\n");
             printf(" - help : get a list of all available commands\n");
@@ -79,27 +79,27 @@ int main(int argc, char** argv) {
             printf(" - cd <dirname> : open a directory\n");
             printf(" - ls : list the content of the current directory\n");
             printf(" - pwd : print the current directory\n");
-        } else if (!strcmp(cmd, "quit")) {
+        } else if (!strncmp(cmd, "q", 1) || !strncmp(cmd, "quit", 4)) {
             // quit function
             printf("Exiting...\n");
             break;
-        } else if (!strcmp(cmd, "touch")) {
+        } else if (!strncmp(cmd, "touch", 5)) {
             if (!strcmp(args[0], ""))
                 printf("Usage: touch <filename>\n");
             else
                 create_file((char*) args[0], disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "rm")) {
+        } else if (!strncmp(cmd, "rm", 2)) {
             if (!strcmp(args[0], ""))
                 printf("Usage: rm <filename>\n");
             else
                 delete_file((char*) args[0], disk->cur_dir, 0, disk);
-        } else if (!strcmp(cmd, "rd")) {
-            if (!strcmp(args[0], "") || !strcmp(args[1], "") || !strcmp(args[2], ""))
+        } else if (!strncmp(cmd, "rd", 2)) {
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH) || !strncmp(args[2], "", MAX_ARG_LENGTH))
                 printf("Usage: rd <filename> <position> <number of bytes>\n");
             else
                 read_file((char*) args[0], atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "wr")) {
-            if (!strcmp(args[0], "") || !strcmp(args[1], "") || !strcmp(args[2], ""))
+        } else if (!strncmp(cmd, "wr", 2)) {
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH) || !strncmp(args[2], "", MAX_ARG_LENGTH))
                 printf("Usage: wr <filename> <position> <number of bytes>\n");
             else {
                 printf("Input to write (ENTER to confirm):\n");
@@ -111,28 +111,41 @@ int main(int argc, char** argv) {
                 }
                 write_file(args[0], buf, atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
             }
-        } else if (!strcmp(cmd, "seek")) {
-            if (!strcmp(args[0], "") || !strcmp(args[1], ""))
+        } else if (!strncmp(cmd, "seek", 4)) {
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH))
                 printf("Usage: seek <filename> <position>\n");
             else
                 seek_in_file((char*) args[0], atoi(args[1]), disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "mkdir")) {
-            if (!strcmp(args[0], ""))
+        } else if (!strncmp(cmd, "mkdir", 5)) {
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH))
                 printf("Usage: mkdir <dirname>\n");
             else
                 create_dir((char*) args[0], disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "rmdir")) {
-            if (!strcmp(args[0], ""))
+        } else if (!strncmp(cmd, "rmdir", 5)) {
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH))
                 printf("Usage: rmdir <dirname>\n");
             else
                 delete_dir((char*) args[0], disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "cd")) {
+        } else if (!strncmp(cmd, "cd", 2)) {
             change_dir((char*) args[0], &disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "ls")) {
+            // if (!strncmp(args[0], "", 1))
+            //     path = "/";
+            // else if (!strncmp(args[0], "..", 2))
+            //     memset(path + strlen(path) - strlen(args[0]), 0, strlen(args[0]));
+            // else {
+            //     printf("ARG: %s\n", args[0]);
+            //     if (strncmp(path, "/", 1)) {
+            //         path = strncat(path, "/", 2);
+            //         path = strncat(path, args[0], strlen(args[0])+1);
+            //     }
+            //     else
+            //         path = strncat(path, args[0], strlen(args[0])+1);
+            // }
+        } else if (!strncmp(cmd, "ls", 2)) {
             list_dir(disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "pwd")) {
+        } else if (!strncmp(cmd, "pwd", 3)) {
             print_cur_dir(disk->cur_dir, disk);
-        } else if (!strcmp(cmd, "disk_print")) {
+        } else if (!strncmp(cmd, "disk_print", 10)) {
             disk_print(disk);
         } else {
             printf("Command \"%s\" not recognized!\n", cmd);
