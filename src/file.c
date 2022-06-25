@@ -156,7 +156,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         printf("Creating directory %s...\n", dirname);
     if (strlen(dirname) > 30) {
         printf("Unable to create directory: directory name lenght cannot exceed 30 characters!\n");
-    return NULL;
+        return NULL;
     }
     if (parent_dir && dir_exists(dirname, parent_dir, disk)) {
         printf("Unable to create direcotry: directory already exists!\n");
@@ -260,7 +260,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
         printf("Error: cannot retreive FAT block pointer\n");
         return -1;
     }
-    for (int i = 0; cur_fat_block; i++) {
+    for (int i = 0; cur_fat_block->busy; i++) {
         next_entry_idx = cur_fat_block->data;
         if (DEBUG) printf("Cleaning block FAT data...\n");
         cur_fat_block->busy = 0;
@@ -346,7 +346,7 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
     while (deleted < tot_files && i < dir->num_files + dir->num_dirs) {
         FileHead* file = get_file_head_ptr(dir->files[i], disk);
         // int file_idx = file->idx;
-        if (file && !file->is_dir) {
+        if (file && file->is_dir == 0) {
             ret = delete_file(file->name, dir->idx, 1, disk);
             deleted++;
             if (ret)

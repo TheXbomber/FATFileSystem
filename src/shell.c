@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
             printf(" - help : get a list of all available commands\n");
             printf(" - quit : close the program\n");
             printf(" - touch <filename> : create a file\n");
-            printf(" - rm <filename> : delete a file\n");
+            printf(" - rmfile <filename> : delete a file\n");
             printf(" - rd <filename> <pos> <n> : read n bytes (0 for all) from a file starting from position pos (-1 for current)\n");
             printf(" - wr <filename> <pos> <n> : write n bytes (0 for all) in a file starting from position pos (-1 for current)\n");
             printf(" - seek <filename> <pos> : change the current position of a file to pos (-1 for file end)\n");
@@ -88,9 +88,9 @@ int main(int argc, char** argv) {
                 printf("Usage: touch <filename>\n");
             else
                 create_file((char*) args[0], disk->cur_dir, disk);
-        } else if (!strncmp(cmd, "rm", 2)) {
+        } else if (!strncmp(cmd, "rmfile", 6)) {
             if (!strcmp(args[0], ""))
-                printf("Usage: rm <filename>\n");
+                printf("Usage: rmfile <filename>\n");
             else
                 delete_file((char*) args[0], disk->cur_dir, 0, disk);
         } else if (!strncmp(cmd, "rd", 2)) {
