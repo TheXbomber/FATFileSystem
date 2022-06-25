@@ -1,7 +1,8 @@
-.vscode
-docs/FATFileSystem.aux
-docs/FATFileSystem.log
-docs/FATFileSystem.out
-docs/FATFileSystem.synctex.gz
-docs/FATFileSystem.toc
-docs/code
+/.vscode
+/docs/FATFileSystem.aux
+/docs/FATFileSystem.log
+/docs/FATFileSystem.out
+/docs/FATFileSystem.synctex.gz
+/docs/FATFileSystem.tex
+/docs/FATFileSystem.toc
+/docs/code
