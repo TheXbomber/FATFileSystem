@@ -5,13 +5,13 @@
 typedef struct Dir Dir;
 
 typedef struct {
-    int idx;
+    int idx;            // index of the disk block
     char name[30];
     int is_dir;         // 0
     int size;
     int pos;            // current position in the file
-    int parent_dir;    // directory that stores the file
-    int start;    // pointer to first block of file
+    int parent_dir;     // directory that stores the file
+    int start;          // pointer to first block of file
 } FileHead;
 
 struct Dir {
@@ -21,7 +21,7 @@ struct Dir {
     int parent_dir;
     int num_files;      // number of files
     int num_dirs;       // number of subdirectories
-    int start;    // position in the FAT   
+    int start;          // position in the FAT   
     int files[BLOCK_SIZE - 30*sizeof(char) - 5*sizeof(int)];   // list of files in directory
 };
 

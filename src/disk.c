@@ -34,20 +34,14 @@ Disk* disk_init(char* buffer, int format) {
     }
     
     Disk* disk = (Disk*) buffer;
-    if (format) {
-        // int fatsize = FAT_SIZE;
+    if (format)
         disk->size = DISK_SIZE - 3*sizeof(int) - sizeof(Fat);
-    }
+
     if (DEBUG) 
         printf("Disk size: %d\n", disk->size);
 
-    // disk->cur_dir = (Dir*) (buffer + sizeof(int) + sizeof(Dir*));
-    // disk->root_dir = (Dir*) (buffer + sizeof(int) + 2*sizeof(Dir*));
-    // disk->data = (char*) (buffer + sizeof(Disk));
-    // disk->fat = (Fat*) (buffer + sizeof(Disk));
     if (format)
         fat_init(&disk->fat);
-    //printf("First FAT: %p, %d, %d\n", disk->fat.array, disk->fat.array[0].data, disk->fat.array[0].busy);
 
     if (DEBUG)
         printf("Disk initialized correctly at %p\n", disk);

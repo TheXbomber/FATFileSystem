@@ -14,6 +14,7 @@ typedef struct {
     char data[DISK_SIZE - 3*sizeof(int) - sizeof(Fat)];
 } Disk;
 
+// maps the file filename in memory
 char* map_file(char* filename);
 
 // initializes disk from file and returns the pointer to it

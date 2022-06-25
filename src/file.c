@@ -2,7 +2,6 @@
 #include "headers/file.h"
 #include "headers/disk.h"
 #include <stdio.h>
-#include <math.h>
 #include <string.h>
 
 FatEntry* get_fat_entry_ptr(int idx, Disk* disk) {
@@ -137,16 +136,14 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     File* file = (File*) find_block(disk);
     //printf("File pointer at %p\n", file);
     file->idx = get_block_idx(disk);
-    file->free_in_block = BLOCK_SIZE; // (- sizeof(File))
+    file->free_in_block = BLOCK_SIZE;
     //printf("free: %d\n", file->free_in_block);
     block->file = file->idx;
     //printf("block->file: %p %p free: %d\n", block->file, *block->file, (*block->file)->free_in_block);
 
     printf("File %s created successfully\n", filename);
-    if (DEBUG) {
-        // int index = head->start->data;
+    if (DEBUG)
         printf("Name: %s\tParent directory: %s\tSize: %d\tIndex: %d\tFAT idx: %d\n", head->name, parent_dir_ptr->name, head->size, head->idx, head->start);
-    }
 
     return 0;
 }
@@ -188,8 +185,6 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     new_dir->num_files = 0;
     new_dir->num_dirs = 0;
     start_block->file = new_dir->idx;
-    // new_dir->dirs = (Dir**) (new_dir + sizeof(Dir) - sizeof(FileHead**));
-    // new_dir->files = (FileHead**) (new_dir + sizeof(Dir));
 
     Dir* parent_dir_ptr;
     if (parent_dir) {
@@ -382,7 +377,7 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
     entry->data = -1;
     disk->fat.free_blocks++;
     // we clean the directory's disk data
-    memset(dir, 0, BLOCK_SIZE); // (- sizeof(Dir))
+    memset(dir, 0, BLOCK_SIZE);
     return 0;
 }
 
@@ -530,12 +525,12 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
                 block = &disk->fat.array[idx];
             }
             idx = block->data;
-            //printf("Reading from FAT %d\n", idx);
+            // printf("Reading from FAT %d\n", idx);
             // printf("Getting file ptr for FAT block %d\n", disk->fat.array[idx].file);
             file = get_file_ptr(disk->fat.array[idx].file, disk);
         } else {
             idx = next_idx;
-            //printf("Reading from FAT %d\n", idx);
+            // printf("Reading from FAT %d\n", idx);
             // printf("Getting file ptr for FAT block %d\n", disk->fat.array[idx].file);
             file = get_file_ptr(disk->fat.array[next_idx].file, disk);
         }
@@ -588,7 +583,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     }
     if(head->pos == -1)
         head->pos = head->size;
-    //printf("Opened file with head %p\n", head);
+    // printf("Opened file with head %p\n", head);
     if (pos && (pos >= head->size || pos < -2)) {
         printf("Error: position is invalid!\n");
         return -1;
@@ -596,7 +591,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
 
     int sum = 0;    // sum of written bytes
     FatEntry* block = get_fat_entry_ptr(head->idx, disk);
-    //printf("Head points to %p in the FAT\n", block);
+    // printf("Head points to %p in the FAT\n", block);
     FatEntry* prev_block;   // to store the previous FAT block when allocating a new one
     File* file;     // pointer to the disk block
     int next_idx;   // to update the FAT after allocating a new block
@@ -628,34 +623,32 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
                 block = &disk->fat.array[idx];
             }
             idx = block->data;
-            //printf("Writing in FAT %d\n", idx);
+            // printf("Writing in FAT %d\n", idx);
             file = get_file_ptr(disk->fat.array[idx].file, disk);
             if (!file) {
                 printf("Error retreiving file index!\n");
                 return -1;
             }
-            //printf("First iteration: file points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
+            // printf("First iteration: file points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         } else {
             idx = next_idx;
-            //printf("Writing in FAT %d\n", idx);
+            // printf("Writing in FAT %d\n", idx);
             file = get_file_ptr(disk->fat.array[idx].file, disk);
             if (!file) {
                 printf("Error retreiving file index!\n");
                 return -1;
             }
-            //printf("File points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
+            // printf("File points to %p in the disk (%d in FAT, next is %d)\n", file, head->start->idx, idx);
         }
         FatEntry* entry_ptr = get_fat_entry_ptr(file->idx, disk);
         block = entry_ptr;
         // write until the block is full
         if (DEBUG)
             printf("Writing in block (file: %s\taddress: %p\tidx: %d\tdata: %p)...\n", head->name, file, file->idx, file->data);
-        //printf("Free bytes in block: %d\n", file->free_in_block);
+        // printf("Free bytes in block: %d\n", file->free_in_block);
         char* block_end = file->data + sizeof(file->data);
         // printf("Block size: %ld\n", sizeof(file->data));
-        // printf("j: %d\toffset: %d\n", j, block_offset);
-        // printf("Comparing: %p %p\n", &file->data[j + block_offset], block_end);
-        // printf("COND: %d\n", &file->data[j + block_offset] < block_end);
+        
         while (sum < n_bytes && &file->data[j + block_offset] < block_end) {
             int override = 0;
             if (file->data[j + block_offset]) {
