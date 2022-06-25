@@ -260,7 +260,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
         printf("Error: cannot retreive FAT block pointer\n");
         return -1;
     }
-    for (int i = 0; cur_fat_block->busy; i++) {
+    for (int i = 0; cur_fat_block; i++) {
         next_entry_idx = cur_fat_block->data;
         if (DEBUG) printf("Cleaning block FAT data...\n");
         cur_fat_block->busy = 0;
@@ -346,7 +346,7 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
     while (deleted < tot_files && i < dir->num_files + dir->num_dirs) {
         FileHead* file = get_file_head_ptr(dir->files[i], disk);
         // int file_idx = file->idx;
-        if (file && file->is_dir == 0) {
+        if (file && !file->is_dir) {
             ret = delete_file(file->name, dir->idx, 1, disk);
             deleted++;
             if (ret)
@@ -498,7 +498,7 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head)
         handle_error("error opening file!");
-    if (pos >= head->size || pos < -1) {
+    if (pos >= head->size || pos < -2) {
         printf("Error: position is invalid!\n");
         return -1;
     }
@@ -513,6 +513,8 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
     int next_idx;
 
     if (pos == -1)
+        pos = head->size;
+    if (pos == -2)
         pos = head->pos;
     int block_num = pos / (BLOCK_SIZE - 2*sizeof(int));
     int block_offset = pos % (BLOCK_SIZE - 2*sizeof(int));
@@ -587,7 +589,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     if(head->pos == -1)
         head->pos = head->size;
     //printf("Opened file with head %p\n", head);
-    if (pos && (pos >= head->size || pos < -1)) {
+    if (pos && (pos >= head->size || pos < -2)) {
         printf("Error: position is invalid!\n");
         return -1;
     }
@@ -609,6 +611,8 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     if (n_bytes > input_len)
         n_bytes = input_len;
     if (pos == -1)
+        pos = head->size;
+    if (pos == -2)
         pos = head->pos;
     int block_num = pos / (BLOCK_SIZE - 2*sizeof(int));
     int block_offset = pos % (BLOCK_SIZE - 2*sizeof(int));

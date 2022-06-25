@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #define DEBUG 0
+#define MAX_CMD_LENGHT 10
 #define MAX_ARG_LENGTH 30
 #define handle_error(msg) ({\
     perror(msg);\
