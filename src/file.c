@@ -298,7 +298,7 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
         }
         if (sub_dir_ptr->is_dir && !strcmp(sub_dir_ptr->name, dirname)){
             to_delete = sub_dir_ptr;
-            printf("To delete: %s\n", to_delete->name);
+            // printf("To delete: %s\n", to_delete->name);
             break;
         }
     }
