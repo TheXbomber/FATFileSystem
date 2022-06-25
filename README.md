@@ -1,17 +1,19 @@
 # FATFileSystem
 <p>
-File system that uses a FAT structure on a memory mapped buffer.
+File system that uses a FAT structure on a memory mapped buffer.<br>
+<strong>Author</strong>:<br>
+Alessandro Rocchi
 </p>
 <p>
-To compile the program:
+To <strong>compile</strong> the program:
 <ul>
     <li>move to directory <code>src</code></li>
     <li>use the command <code>make</code></li>
 </ul>
 </p>
 <p>
-To run the program use <code>./shell</code>
+To <strong>run</strong> the program use <code>./shell</code>
 </p>
 <p>
-To format the disk use <code>make clean</code>
+To <strong>format</strong> the disk use <code>make clean</code>
 </p>
