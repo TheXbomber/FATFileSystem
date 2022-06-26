@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 21.12.10) (preloaded format=pdflatex 2022.1.18)  25 JUN 2022 10:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 21.12.10) (preloaded format=pdflatex 2022.1.18)  26 JUN 2022 11:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -568,9 +568,9 @@ Package rerunfilecheck Info: File `FATFileSystem.out' has not changed.
 (rerunfilecheck)             Checksum: 700B99E5F55A61AC9258A7C9ED9FF8B6;952.
  ) 
 Here is how much of TeX's memory you used:
- 13581 strings out of 478659
- 211132 string characters out of 2843550
- 871334 words of memory out of 3000000
+ 13582 strings out of 478659
+ 211147 string characters out of 2843550
+ 884334 words of memory out of 3000000
  31446 multiletter control sequences out of 15000+600000
  411777 words of font info for 42 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -586,9 +586,9 @@ Alessandro\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1440.pk>
  <C:\Users\Alessandro\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\e
 crm2074.pk> <C:\Users\Alessandro\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/
 ec/dpi600\ecbx2074.pk>
-Output written on FATFileSystem.pdf (5 pages, 99017 bytes).
+Output written on FATFileSystem.pdf (5 pages, 99272 bytes).
 PDF statistics:
- 373 PDF objects out of 1000 (max. 8388607)
- 61 named destinations out of 1000 (max. 500000)
+ 374 PDF objects out of 1000 (max. 8388607)
+ 62 named destinations out of 1000 (max. 500000)
  73 words of extra memory for PDF output out of 10000 (max. 10000000)
 
