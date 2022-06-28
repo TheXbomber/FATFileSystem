@@ -198,7 +198,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         }
     }
 
-    if (strncmp("/", dirname, 1))
+    if (strncmp("/", dirname, 30))
         printf("Directory %s created successfully\n", dirname);
     if (DEBUG) {
         if (parent_dir)
@@ -222,7 +222,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
 
     // properly set the pointers to the other files to fill the hole
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
-    for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs - 1; i++) {
+    for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs; i++) {
         FileHead* file = get_file_head_ptr(cur_dir_ptr->files[i], disk);
         if (!strncmp(file->name, filename, 30) && !file->is_dir) {
             // printf("Found file\n");
@@ -319,7 +319,7 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
         int i = 0;
         int deleted = 0;
         int tot_dirs = dir->num_dirs;
-        while (deleted < tot_dirs && dir->num_dirs + dir->num_files) {
+        while (deleted < tot_dirs && tot_dirs + dir->num_files) {
             Dir* next_dir = get_dir_ptr(dir->files[i], disk);
             // we use a recursive call to delete the subdirectories
             if (next_dir && next_dir->is_dir) {
@@ -350,8 +350,8 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
             i++;
     }
 
-    // properly set the pointers to the other dirs to fill the hole
-    for (int i = 0; i < cur_dir->num_dirs + cur_dir->num_files - 1; i++) {
+    // properly set the pointers to the other dirs and files to fill the hole
+    for (int i = 0; i < cur_dir->num_dirs + cur_dir->num_files; i++) {
         if (cur_dir->files[i] == dir->idx) {
             // printf("Found dir\n");
             cur_dir->files[i] = 0;
@@ -404,6 +404,7 @@ int list_dir(int dir, Disk* disk) {
         }
     }
     for (i = 0; i < dir_ptr->num_files + dir_ptr->num_dirs; i++) {
+        // printf("Getting file head pointer to %d\n", dir_ptr->files[i]);
         FileHead* file_ptr = get_file_head_ptr(dir_ptr->files[i], disk);
         if (!file_ptr) {
             printf("Error getting file head pointer\n");
@@ -421,7 +422,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
     if (DEBUG)
         printf("Opening directory %s ...\n", dirname);
     Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
-    if (!strncmp(dirname, "..", 1)) {
+    if (!strncmp(dirname, "..", 30)) {
         Dir* parent_dir_ptr = get_dir_ptr(cur_dir_ptr->parent_dir, disk);
         if (!cur_dir_ptr->parent_dir) {
             printf("Unable to open directory: root has no parent directory!\n");
@@ -432,7 +433,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
             printf("Switched current directory to %s\n", parent_dir_ptr->name);
         return 0;
     }
-    if (!strncmp(dirname, "", 1)) {
+    if (!strncmp(dirname, "", 30)) {
         *cur_dir = disk->root_dir;
         if (DEBUG)
             printf("Switched current directory to %s\n", cur_dir_ptr->name);
