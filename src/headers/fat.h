@@ -1,7 +1,7 @@
 #pragma once
 
 #define FAT_BLOCKS_MAX 256
-#define FAT_SIZE sizeof(Fat)+FAT_BLOCKS_MAX*sizeof(FatEntry)
+#define FAT_SIZE sizeof(Fat)
 
 typedef struct File File;
 
