@@ -540,7 +540,7 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
         // read until the block is full
         if (DEBUG)
             printf("\nReading from block...\n");
-        while (sum < n_bytes && j < BLOCK_SIZE - 2*sizeof(int)) {
+        while (sum < n_bytes && j + block_offset < BLOCK_SIZE - 2*sizeof(int)) {
             printf("%c", file->data[j + block_offset]);
             j++;
             sum++;
