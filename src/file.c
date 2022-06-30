@@ -180,7 +180,6 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     new_dir->is_dir = 1;
     for (int i = 0; dirname[i]; i++)
         new_dir->name[i] = dirname[i];
-    new_dir->start = start_block->idx;
     new_dir->parent_dir = parent_dir;
     new_dir->num_files = 0;
     new_dir->num_dirs = 0;
@@ -202,9 +201,9 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         printf("Directory %s created successfully\n", dirname);
     if (DEBUG) {
         if (parent_dir)
-            printf("Name: %s\t Parent dir: %s\tFiles: %d\tIndex: %d\tFAT block idx: %d\n", new_dir->name, parent_dir_ptr->name, new_dir->num_files, new_dir->idx, new_dir->start);
+            printf("Name: %s\t Parent dir: %s\tFiles: %d\tIndex: %d\n", new_dir->name, parent_dir_ptr->name, new_dir->num_files, new_dir->idx);
         else
-            printf("Name: %s\t Parent dir: -\tFiles: %d\tIndex: %d\tFAT block idx: %d\n", new_dir->name, new_dir->num_files, new_dir->idx, new_dir->start);
+            printf("Name: %s\t Parent dir: -\tFiles: %d\tIndex: %d\n", new_dir->name, new_dir->num_files, new_dir->idx);
     }
 
     return new_dir;
@@ -705,7 +704,10 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
     FileHead* file = open_file(filename, cur_dir, disk);
     if (!file)
         handle_error("Error opening file");
-
+    if (pos > file->size) {
+        printf("Position not valid!\n");
+        return -1;
+    }
     if (pos == -1)
         file->pos = file->size-1;
     file->pos = pos;
