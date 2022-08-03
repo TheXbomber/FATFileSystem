@@ -90,7 +90,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     if (DEBUG)
         printf("Creating file %s...\n", filename);
     if (strlen(filename) > 30) {
-        printf("Unable to create file: file name lenght cannot exceed 30 characters!\n");
+        printf("Unable to create file: file name length cannot exceed 30 characters!\n");
         return -1;
     }
     if (file_exists(filename, parent_dir, disk)) {
@@ -117,7 +117,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     head->size = 0;
     head->pos = 0;
     head->parent_dir = parent_dir;
-    head->start = start_block->idx;
+    head->start = get_fat_entry_idx(disk, start_block);
     Dir* parent_dir_ptr = get_dir_ptr(parent_dir, disk);
     parent_dir_ptr->num_files++;
     for (int i = 0; i < parent_dir_ptr->num_files + parent_dir_ptr->num_dirs; i++) {
@@ -679,8 +679,9 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
                 printf("Requesting new block...\n");
             prev_block = block;
             block = request_fat_blocks(disk, prev_block, 1);
-            prev_block->data = block->idx;
-            next_idx = block->idx;
+            int index = get_fat_entry_idx(disk, block);
+            prev_block->data = index;
+            next_idx = index;
             file = (File*) find_block(disk);
             file->idx = get_block_idx(disk);
             block->file = file->idx;
@@ -688,7 +689,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
             block->file = file->idx;
         } else {
             block = &disk->fat.array[entry_ptr->data];
-            next_idx = block->idx;
+            next_idx = get_fat_entry_idx(disk, block);
         }
         block_offset = 0;
     }

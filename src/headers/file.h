@@ -82,3 +82,6 @@ File* get_file_ptr(int idx, Disk* disk);
 
 // returns the pointer to the directory relative to the disk block with index idx
 Dir* get_dir_ptr(int idx, Disk* disk);
+
+// returns the index of a fat entry (-1 if not found)
+int get_fat_entry_idx(Disk* disk, FatEntry* fatentry);

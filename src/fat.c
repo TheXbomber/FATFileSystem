@@ -21,8 +21,18 @@ void fat_init(Fat* fat) {
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {  // initialize empty FAT
         fat->array[i].data = -1;
         fat->array[i].busy = 0;
-        fat->array[i].idx = i;
+        //fat->array[i].idx = i;
     }
     if (DEBUG)
         printf("FAT initalized correctly at %p\n", fat);
+}
+
+int get_fat_entry_idx(Disk* disk, FatEntry* fatentry) {
+    Fat* fat = &disk->fat;
+    for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
+        FatEntry* fe = &fat->array[i];
+        if (fatentry->file == fe->file && fatentry->data == fe->data)
+            return i;
+    }
+    return -1;
 }
