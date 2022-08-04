@@ -137,10 +137,10 @@ int main(int argc, char** argv) {
             disk_print(disk);
         } else if (!strncmp(cmd, "format", MAX_CMD_LENGTH)) {
             printf("Are you sure you want to format the disk? (Y/N)\n");
-            char opt;
+            char opt[2];
             while (1) {
-                opt = (char) fgetc(stdin);
-                if (opt == 'y' || opt == 'Y') {
+                fgets(opt, 255, stdin);
+                if ((opt[0] == 'y' || opt[0] == 'Y') && opt[1] == '\n') {
                     int ret = unlink("my_disk.img");
                     if (ret)
                         handle_error("Error in unlink");
@@ -155,14 +155,14 @@ int main(int argc, char** argv) {
                     disk->cur_dir = disk->root_dir;
                     disk->cur_path[0] = '/';
                     printf("Disk formatted successfully\n");
-                    fgetc(stdin);
                     break;
-                } else if (opt == 'n' || opt == 'N') {
-                    fgetc(stdin);
+                } else if ((opt[0] == 'n' || opt[0] == 'N') && opt[1] == '\n') {
                     break;
                 }
-                else
+                else {
                     printf("Please type Y to confirm or N to deny\n");
+                    continue;
+                }
             }
         } else {
             printf("Command \"%s\" not recognized!\n", cmd);
