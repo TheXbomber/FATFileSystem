@@ -69,7 +69,7 @@ int dir_exists(char* dirname, int cur_dir, Disk* disk);
 FileHead* open_file(char* filename, int cur_dir, Disk* disk);
 
 // prints the current directory
-void print_cur_dir(int cur_dir, Disk* disk);
+void print_cur_dir(Disk* disk);
 
 // returns the pointer to the FAT block relative to the disk block with index idx
 FatEntry* get_fat_entry_ptr(int idx, Disk* disk);

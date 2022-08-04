@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
         } else if (!strncmp(cmd, "ls", MAX_CMD_LENGTH)) {
             list_dir(disk->cur_dir, disk);
         } else if (!strncmp(cmd, "pwd", MAX_CMD_LENGTH)) {
-            print_cur_dir(disk->cur_dir, disk);
+            print_cur_dir(disk);
         } else if (!strncmp(cmd, "disk_print", MAX_CMD_LENGTH) || !strncmp(cmd, "dp", MAX_CMD_LENGTH)) {
             disk_print(disk);
         } else {

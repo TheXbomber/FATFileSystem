@@ -51,10 +51,10 @@ Disk* disk_init(char* buffer, int format) {
 
 void disk_print(Disk* disk) {
     printf("----- DISK INFO -----\n");
-    printf("--- FAT ---\nFree_blocks: %d\nContent:\n", disk->fat.free_blocks);
-    for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
+    printf("--- FAT ---\nFree_blocks: %d\nContent (-1 is file end, -2 is not used):\n", disk->fat.free_blocks);
+    for (int i = 0; i < DISK_PRINT_LINES; i++) {
         // printf("Data: %d\t\tBusy: %d\t\tIdx: %d\t\tDisk block idx: %d\t\tAddr: %p\n", disk->fat.array[i].data, disk->fat.array[i].busy, disk->fat.array[i].idx, disk->fat.array[i].file, &(disk->fat.array[i]));
-        printf("D: %d\t\tB: %d\t\tDI: %d\t\tA: %p\n", disk->fat.array[i].data, disk->fat.array[i].busy, disk->fat.array[i].file, &(disk->fat.array[i]));
+        printf("D: %d\t\tDI: %d\t\tA: %p\n", disk->fat.array[i].data, disk->fat.array[i].file, &(disk->fat.array[i]));
     }
     printf("--- DISK ---\nDisk size: %d\n", disk->size);
     printf("----- END -----\n");
@@ -73,8 +73,9 @@ FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks) {
     if (prev)
         previous = prev;
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
-        if (!(disk->fat.array[i].busy)) {
-            disk->fat.array[i].busy = 1;
+        if (!(disk->fat.array[i].data != -2)) {
+            //disk->fat.array[i].busy = 1;
+            disk->fat.array[i].data = -1;
             if (allocated || prev)
                 previous->data = get_fat_entry_idx(disk, &disk->fat.array[i]);
             allocated++;

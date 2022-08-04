@@ -242,8 +242,8 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     int next_entry_idx;
     //printf("Cleaning head FAT data...\n");
     entry->file = 0;
-    entry->busy = 0;
-    entry->data = -1;
+    //entry->busy = 0;
+    entry->data = -2;
     disk->fat.free_blocks++;
     //printf("Cleaning head disk data...\n");
     memset(head, 0, sizeof(FileHead));
@@ -257,8 +257,8 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     for (int i = 0; cur_fat_block; i++) {
         next_entry_idx = cur_fat_block->data;
         if (DEBUG) printf("Cleaning block FAT data...\n");
-        cur_fat_block->busy = 0;
-        cur_fat_block->data = -1;
+        //cur_fat_block->busy = 0;
+        cur_fat_block->data = -2;
         disk->fat.free_blocks++;
         if (DEBUG) printf("Cleaning block disk data...\n");
         // printf("Getting file pointer for %d\n", cur_fat_block->file);
@@ -372,8 +372,8 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
         return -1;
     }
     entry->file = 0;
-    entry->busy = 0;
-    entry->data = -1;
+    //entry->busy = 0;
+    entry->data = -2;
     disk->fat.free_blocks++;
     // we clean the directory's disk data
     memset(dir, 0, BLOCK_SIZE);
@@ -737,7 +737,7 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
     return file->pos;
 }
 
-void print_cur_dir(int cur_dir, Disk* disk) {
-    Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
-    printf("Current directory: %s\n", cur_dir_ptr->name);
+void print_cur_dir(Disk* disk) {
+    //Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
+    printf("Current directory: %s\n", disk->cur_path);
 }
