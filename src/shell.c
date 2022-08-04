@@ -11,7 +11,7 @@
 int main(int argc, char** argv) {
     Disk* disk;
     char* buffer;
-    // char* path = (char*)malloc(300);
+    // char path[300] = {};
     if (!access("my_disk.img", F_OK)) {
         buffer = map_file("my_disk.img");
         if (DEBUG)
@@ -27,15 +27,15 @@ int main(int argc, char** argv) {
             handle_error("error creating root directory");
         disk->root_dir = dir->idx;
         disk->cur_dir = disk->root_dir;
+        disk->cur_path[0] = '/';
     }
 
-    // path = "/";
     printf("*** FAT File System Shell ***\n");
     printf("Type \"help\" for a list of available commands\n");
     while(1) {
         Dir* cur_dir_ptr = get_dir_ptr(disk->cur_dir, disk);
-        printf("%s> ", cur_dir_ptr->name);
-        // printf("%s> ", path);
+        // printf("%s> ", cur_dir_ptr->name);
+        printf("%s> ", disk->cur_path);
         char cmd[100] = {};
         char args[100][100] = {};
         char c = (char) fgetc(stdin);
@@ -128,19 +128,6 @@ int main(int argc, char** argv) {
                 delete_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strncmp(cmd, "cd", MAX_CMD_LENGTH)) {
             change_dir((char*) args[0], &disk->cur_dir, disk);
-            // if (!strncmp(args[0], "", MAX_ARG_LENGTH))
-            //     path = "/";
-            // else if (!strncmp(args[0], "..", MAX_ARG_LENGTH))
-            //     memset(path + strlen(path) - strlen(args[0]), 0, strlen(args[0]));
-            // else {
-            //     printf("ARG: %s\n", args[0]);
-            //     if (strncmp(path, "/", MAX_ARG_LENGTH)) {
-            //         path = strncat(path, "/", MAX_ARG_LENGTH);
-            //         path = strncat(path, args[0], strlen(args[0])+1);
-            //     }
-            //     else
-            //         path = strncat(path, args[0], strlen(args[0])+1);
-            // }
         } else if (!strncmp(cmd, "ls", MAX_CMD_LENGTH)) {
             list_dir(disk->cur_dir, disk);
         } else if (!strncmp(cmd, "pwd", MAX_CMD_LENGTH)) {

@@ -427,12 +427,27 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
             printf("Unable to open directory: root has no parent directory!\n");
             return -1;
         }
+        int j = 0;
+        for (int i = strlen(disk->cur_path)-1; i >= 0; i--) {
+            // printf("%c\n", disk->cur_path[i]);
+            if (disk->cur_path[i] == '/') {
+                // printf("SUB\n");
+                if (i == 0)
+                    memset(&disk->cur_path[i+1], 0, j);
+                else
+                    memset(&disk->cur_path[i], 0, j);
+                break;
+            }
+            j++;
+        }
         *cur_dir = parent_dir_ptr->idx;
         if (DEBUG)
             printf("Switched current directory to %s\n", parent_dir_ptr->name);
         return 0;
     }
     if (!strncmp(dirname, "", 30)) {
+        memset(disk->cur_path, 0, 300);
+        disk->cur_path[0] = '/';
         *cur_dir = disk->root_dir;
         if (DEBUG)
             printf("Switched current directory to %s\n", cur_dir_ptr->name);
@@ -444,9 +459,12 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
     }
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* subdir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);
-        if (!strncmp(dirname, subdir_ptr->name, 30) && subdir_ptr->is_dir) {
+        if (!strncmp(dirname, subdir_ptr->name, 30) && subdir_ptr->is_dir) {    
+            if (strncmp(cur_dir_ptr->name, "/", 30))
+                strncat(disk->cur_path, "/", 2);
             *cur_dir = subdir_ptr->idx;
             cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
+            strncat(disk->cur_path, cur_dir_ptr->name, strlen(cur_dir_ptr->name));
             if (DEBUG)
                 printf("Switched current directory to %s\n", cur_dir_ptr->name);
             break;
