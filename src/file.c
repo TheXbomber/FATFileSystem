@@ -118,6 +118,10 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     head->pos = 0;
     head->parent_dir = parent_dir;
     head->start = get_fat_entry_idx(disk, start_block);
+    if (head->start == -1) {
+        printf("Error getting FAT entry index!\n");
+        return -1;
+    }
     Dir* parent_dir_ptr = get_dir_ptr(parent_dir, disk);
     parent_dir_ptr->num_files++;
     for (int i = 0; i < parent_dir_ptr->num_files + parent_dir_ptr->num_dirs; i++) {
@@ -698,6 +702,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
             prev_block = block;
             block = request_fat_blocks(disk, prev_block, 1);
             int index = get_fat_entry_idx(disk, block);
+            if (index == -1) {
+                printf("Error getting FAT entry index!\n");
+                return -1;
+            }
             prev_block->data = index;
             next_idx = index;
             file = (File*) find_block(disk);
@@ -708,6 +716,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         } else {
             block = &disk->fat.array[entry_ptr->data];
             next_idx = get_fat_entry_idx(disk, block);
+            if (next_idx == -1) {
+                printf("Error getting FAT entry index!\n");
+                return -1;
+            }
         }
         block_offset = 0;
     }

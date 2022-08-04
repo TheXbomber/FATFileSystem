@@ -76,8 +76,13 @@ FatEntry* request_fat_blocks(Disk* disk, FatEntry* prev, int n_blocks) {
         if (!(disk->fat.array[i].data != -2)) {
             //disk->fat.array[i].busy = 1;
             disk->fat.array[i].data = -1;
-            if (allocated || prev)
+            if (allocated || prev) {
                 previous->data = get_fat_entry_idx(disk, &disk->fat.array[i]);
+                if (previous->data == -1) {
+                    printf("Error getting FAT entry index!\n");
+                    return NULL;
+                }
+            }
             allocated++;
             disk->fat.free_blocks--;
             // what will be returned
