@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     printf("*** FAT File System Shell ***\n");
     printf("Type \"help\" for a list of available commands\n");
     while(1) {
-        Dir* cur_dir_ptr = get_dir_ptr(disk->cur_dir, disk);
+        // Dir* cur_dir_ptr = get_dir_ptr(disk->cur_dir, disk);
         // printf("%s> ", cur_dir_ptr->name);
         printf("%s> ", disk->cur_path);
         char cmd[100] = {};
