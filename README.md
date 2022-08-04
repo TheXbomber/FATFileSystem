@@ -15,5 +15,5 @@ To <strong>compile</strong> the program:
 To <strong>run</strong> the program use <code>./shell</code>
 </p>
 <p>
-To <strong>format</strong> the disk use <code>make clean</code>
+To <strong>delete</strong> the disk file use <code>make clean</code>
 </p>

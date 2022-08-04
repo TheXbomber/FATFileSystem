@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
             printf(" - cd <dirname> : open a directory\n");
             printf(" - ls : list the content of the current directory\n");
             printf(" - pwd : print the current directory\n");
+            printf(" - format : format the disk\n");
         } else if (!strncmp(cmd, "q", MAX_CMD_LENGTH) || !strncmp(cmd, "quit", MAX_CMD_LENGTH)) {
             printf("Exiting...\n");
             break;
@@ -134,6 +135,35 @@ int main(int argc, char** argv) {
             print_cur_dir(disk);
         } else if (!strncmp(cmd, "disk_print", MAX_CMD_LENGTH) || !strncmp(cmd, "dp", MAX_CMD_LENGTH)) {
             disk_print(disk);
+        } else if (!strncmp(cmd, "format", MAX_CMD_LENGTH)) {
+            printf("Are you sure you want to format the disk? (Y/N)\n");
+            char opt;
+            while (1) {
+                opt = (char) fgetc(stdin);
+                if (opt == 'y' || opt == 'Y') {
+                    int ret = unlink("my_disk.img");
+                    if (ret)
+                        handle_error("Error in unlink");
+                    buffer = map_file("my_disk.img");
+                    disk = disk_init(buffer, 1);
+                    if (DEBUG)
+                        printf("Creating root directory...\n");
+                    Dir* dir = create_dir("/", 0, disk);
+                    if (!dir)
+                        handle_error("error creating root directory");
+                    disk->root_dir = dir->idx;
+                    disk->cur_dir = disk->root_dir;
+                    disk->cur_path[0] = '/';
+                    printf("Disk formatted successfully\n");
+                    fgetc(stdin);
+                    break;
+                } else if (opt == 'n' || opt == 'N') {
+                    fgetc(stdin);
+                    break;
+                }
+                else
+                    printf("Please type Y to confirm or N to deny\n");
+            }
         } else {
             printf("Command \"%s\" not recognized!\n", cmd);
         }
