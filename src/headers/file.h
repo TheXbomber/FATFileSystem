@@ -64,7 +64,7 @@ int list_dir(int dir, Disk* disk);
 int file_exists(char* filename, int cur_dir, Disk* disk);
 
 // returns 1 if a dir named dirname already exists in the current directory
-int dir_exists(char* dirname, int cur_dir, Disk* disk);
+int dir_exists(char* dirname, int cur_dir, Disk* disk, int* dir_for_file);
 int dir_exists_aux(char* dirname, int* cur_dir, Disk* disk);
 
 // opens a file and returns its header
