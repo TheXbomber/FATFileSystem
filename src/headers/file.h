@@ -55,6 +55,7 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir);
 
 // opens the dir directory and returns 0
 int change_dir(char* dirname, int* cur_dir, Disk* disk);
+int change_dir_aux(char* dirname, int* cur_dir, Disk* disk);
 
 // lists the directory in the current position and returns the number of directories listed
 int list_dir(int dir, Disk* disk);
@@ -64,6 +65,7 @@ int file_exists(char* filename, int cur_dir, Disk* disk);
 
 // returns 1 if a dir named dirname already exists in the current directory
 int dir_exists(char* dirname, int cur_dir, Disk* disk);
+int dir_exists_aux(char* dirname, int* cur_dir, Disk* disk);
 
 // opens a file and returns its header
 FileHead* open_file(char* filename, int cur_dir, Disk* disk);

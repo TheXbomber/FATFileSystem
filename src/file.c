@@ -72,10 +72,46 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
 }
 
 int dir_exists(char* dirname, int cur_dir, Disk* disk) {
-    Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
+    if (!strncmp(dirname, "", MAX_PATH_LENGTH) || !strncmp(dirname, "/", MAX_PATH_LENGTH)) {
+        return 1;
+    }
+    if (!strncmp(dirname, "/", 1))
+        cur_dir = disk->root_dir;
+    char dirnamecpy[MAX_PATH_LENGTH];
+    strcpy(dirnamecpy, dirname);
+    char* token = strtok(dirnamecpy, "/");
+    //printf("token is %s\n", token);
+    while (token) {
+        int ret = dir_exists_aux(token, &cur_dir, disk);
+        if (!ret) {
+            if (DEBUG)
+                printf("Error: directory does not exist!\n");
+            return 0;
+        }
+        token = strtok(NULL, "/");
+        //printf("token is %s\n", token);
+    }
+    return 1;
+}
+
+int dir_exists_aux(char* dirname, int* cur_dir, Disk* disk) {
+    Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
+    if (!strncmp(dirname, "..", MAX_PATH_LENGTH) && !cur_dir_ptr->parent_dir) {
+        printf("Unable to open directory: root has no parent directory!\n");
+        return 0;
+    }
+    //printf("cur dir is %s\n", cur_dir_ptr->name);
+    if (!strncmp(dirname, "..", MAX_PATH_LENGTH)) {
+        Dir* par_dir_ptr = get_dir_ptr(cur_dir_ptr->parent_dir, disk);
+        //printf("%s exists\n", par_dir_ptr->name);
+        *cur_dir = par_dir_ptr->idx;
+        return 1;
+    }
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* subdir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);
-        if (!strncmp(subdir_ptr->name, dirname, 30) && subdir_ptr->is_dir) {
+        if (!strncmp(subdir_ptr->name, dirname, MAX_PATH_LENGTH) && subdir_ptr->is_dir) {
+            //printf("%s exists\n", subdir_ptr->name);
+            *cur_dir = subdir_ptr->idx;
             return 1;
         }
     }
@@ -422,10 +458,44 @@ int list_dir(int dir, Disk* disk) {
 }
 
 int change_dir(char* dirname, int* cur_dir, Disk* disk) {
+    if (!strncmp(dirname, "", MAX_PATH_LENGTH) || !strncmp(dirname, "/", MAX_PATH_LENGTH)) {
+        memset(disk->cur_path, 0, MAX_PATH_LENGTH);
+        disk->cur_path[0] = '/';
+        *cur_dir = disk->root_dir;
+        if (DEBUG)
+            printf("Switched current directory to %s\n", disk->cur_path);
+        return 0;
+    }
+    if (!dir_exists(dirname, *cur_dir, disk)) {
+        printf("Unable to open directory: directory doesn't exist!\n");
+        return -1;
+    }
+    if (!strncmp(dirname, "/", 1)) {
+        memset(disk->cur_path, 0, MAX_PATH_LENGTH);
+        disk->cur_path[0] = '/';
+        *cur_dir = disk->root_dir;
+    }
+    char dirnamecpy[MAX_PATH_LENGTH];
+    strcpy(dirnamecpy, dirname);
+    char* token = strtok(dirnamecpy, "/");
+    //printf("token is %s\n", token);
+    while (token) {
+        int ret = change_dir_aux(token, cur_dir, disk);
+        if (DEBUG && ret) {
+            printf("Error changing directory!\n");
+            return -1;
+        }
+        token = strtok(NULL, "/");
+        //printf("token is %s\n", token);
+    }
+    return 0;
+}
+
+int change_dir_aux(char* dirname, int* cur_dir, Disk* disk) {
     if (DEBUG)
         printf("Opening directory %s ...\n", dirname);
     Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
-    if (!strncmp(dirname, "..", 30)) {
+    if (!strncmp(dirname, "..", MAX_PATH_LENGTH)) {
         Dir* parent_dir_ptr = get_dir_ptr(cur_dir_ptr->parent_dir, disk);
         if (!cur_dir_ptr->parent_dir) {
             printf("Unable to open directory: root has no parent directory!\n");
@@ -448,18 +518,6 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
         if (DEBUG)
             printf("Switched current directory to %s\n", parent_dir_ptr->name);
         return 0;
-    }
-    if (!strncmp(dirname, "", 30)) {
-        memset(disk->cur_path, 0, 300);
-        disk->cur_path[0] = '/';
-        *cur_dir = disk->root_dir;
-        if (DEBUG)
-            printf("Switched current directory to %s\n", cur_dir_ptr->name);
-        return 0;
-    }
-    if (!dir_exists(dirname, *cur_dir, disk)) {
-        printf("Unable to open directory: directory doesn't exist!\n");
-        return -1;
     }
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* subdir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);

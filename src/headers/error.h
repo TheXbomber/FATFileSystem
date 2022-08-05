@@ -7,6 +7,7 @@
 #define MAX_CMD_LENGTH 10
 #define MAX_ARG_LENGTH 30
 #define DISK_PRINT_LINES 20
+#define MAX_PATH_LENGTH 300
 
 #define handle_error(msg) ({\
     perror(msg);\
