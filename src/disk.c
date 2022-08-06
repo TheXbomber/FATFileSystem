@@ -51,10 +51,10 @@ Disk* disk_init(char* buffer, int format) {
 
 void disk_print(Disk* disk) {
     printf("----- DISK INFO -----\n");
-    printf("--- FAT ---\nFree_blocks: %d\nContent (-1 is file end, -2 is not used):\n", disk->fat.free_blocks);
+    printf("--- FAT ---\nFree_blocks: %d\nContent (-1 = file end, -2 = not used):\n", disk->fat.free_blocks);
     for (int i = 0; i < DISK_PRINT_LINES; i++) {
         // printf("Data: %d\t\tBusy: %d\t\tIdx: %d\t\tDisk block idx: %d\t\tAddr: %p\n", disk->fat.array[i].data, disk->fat.array[i].busy, disk->fat.array[i].idx, disk->fat.array[i].file, &(disk->fat.array[i]));
-        printf("D: %d\t\tDI: %d\t\tA: %p\n", disk->fat.array[i].data, disk->fat.array[i].file, &(disk->fat.array[i]));
+        printf("I: %d\t\tD: %d\t\tDI: %d\t\tA: %p\n", i, disk->fat.array[i].data, disk->fat.array[i].file, &(disk->fat.array[i]));
     }
     printf("--- DISK ---\nDisk size: %d\n", disk->size);
     printf("----- END -----\n");
