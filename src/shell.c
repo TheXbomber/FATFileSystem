@@ -103,13 +103,7 @@ int main(int argc, char** argv) {
             if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH) || !strncmp(args[2], "", MAX_ARG_LENGTH))
                 printf("Usage: wr <filename> <position> <number of bytes>\n");
             else {
-                printf("Input to write (ENTER to confirm):\n");
                 char buf[2048] = {};
-                char cc = (char) fgetc(stdin);
-                for (int i = 0; cc != '\n'; i++) {
-                    buf[i] = cc;
-                    cc = (char) fgetc(stdin);
-                }
                 write_file(args[0], buf, atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
             }
         } else if (!strncmp(cmd, "seek", MAX_CMD_LENGTH)) {

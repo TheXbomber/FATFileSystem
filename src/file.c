@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-int directory_exists = 0;
-int invalid_directory = 0;
-
 FatEntry* get_fat_entry_ptr(int idx, Disk* disk) {
     FatEntry* entry_ptr;
     for (int i = 0; i < FAT_BLOCKS_MAX; i++) {
@@ -97,9 +94,10 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
             path[0] ='/';
         //printf("Path: %s\nFilename: %s\n", path, prevtoken);
         int dir_for_file;
-        if (!dir_exists(path, cur_dir, disk, &dir_for_file)) {
-            //printf("Error: directory %s doesn't exist!\n", path);
-            directory_exists = 1;
+        int ret = dir_exists(path, cur_dir, disk, &dir_for_file);
+        if (!ret || ret == -1) {
+            if (DEBUG)
+                printf("Error: directory %s doesn't exist!\n", path);
             return -1;
         }
         //printf("DIR FOR FILE: %s\n", get_dir_ptr(dir_for_file, disk)->name);
@@ -164,11 +162,14 @@ int dir_exists(char* dirname, int cur_dir, Disk* disk, int* dir_for_file) {
                     printf("Directory does not exist!\n");
                 return 0;
             } else {
-                if (!directory_exists)
-                    printf("Unable to open directory: directory %s doesn't exist!\n", prevtoken);
-                invalid_directory = 1;
-                return 0;
+                if (DEBUG)
+                    printf("Error: directory %s does not exist!\n", prevtoken);
+                return -1;
             }
+        } else if (ret == -1) {
+            if (DEBUG)
+                printf("Error: root has no parent directory!\n");
+            return -1;
         }
         //printf("token is %s\n", token);
     }
@@ -181,7 +182,7 @@ int dir_exists_aux(char* dirname, int* cur_dir, Disk* disk) {
     Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
     if (!strncmp(dirname, "..", MAX_PATH_LENGTH) && !cur_dir_ptr->parent_dir) {
         printf("Unable to open directory: root has no parent directory!\n");
-        return 0;
+        return -1;                                       // < ----------- SUS
     }
     //printf("cur dir is %s\n", cur_dir_ptr->name);
     if (!strncmp(dirname, "..", MAX_PATH_LENGTH)) {
@@ -316,13 +317,14 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     if (DEBUG)
         printf("Creating directory %s...\n", dirname);
     
-    if (parent_dir && dir_exists(dirname, parent_dir, disk, NULL)) {
-        if (!invalid_directory)
+    int ret = dir_exists(dirname, parent_dir, disk, NULL);
+    if (parent_dir && ret) {
+        if (ret != -1)
             printf("Unable to create directory: directory already exists!\n");
+        else
+            printf("Unable to create directory: directory does not exist!\n");
         return NULL;
     }
-    if (invalid_directory)
-        return NULL;
 
     if (parent_dir) {
         char dirnamecpy[MAX_PATH_LENGTH];
@@ -419,7 +421,8 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
-    if (!file_exists(filename, cur_dir, disk)) {
+    int ret = file_exists(filename, cur_dir, disk);
+    if (!ret || ret == -1) {
         printf("Unable to delete file: file doesn't exist!\n");
         return -1;
     }
@@ -458,8 +461,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
 
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head) {
-        if (!directory_exists)
-            printf("Unable to delete file: file doesn't exist in current directory!\n");
+        printf("Unable to delete file: file doesn't exist in current directory!\n");
         return -1;
     }
 
@@ -525,9 +527,12 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
 }
 
 int delete_dir(char* dirname, int cur_dir, Disk* disk) {
-    if (!dir_exists(dirname, cur_dir, disk, NULL)) {
-        if (!invalid_directory)
-            printf("Unable to delete directory: directory doesn't exist!\n");
+    int ret = dir_exists(dirname, cur_dir, disk, NULL);
+    if (!ret) {
+        printf("Unable to delete directory: directory doesn't exist!\n");
+        return -1;
+    } else if (ret == -1) {
+        printf("Unable to delete directory: incorrect path!\n");
         return -1;
     }
 
@@ -581,7 +586,7 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
             break;
         }
     }
-    int ret = delete_dir_aux(disk, cur_dir_ptr, to_delete);
+    ret = delete_dir_aux(disk, cur_dir_ptr, to_delete);
     if (ret)
         handle_error("Error in delete_dir_aux!");
     cur_dir_ptr->num_dirs--;
@@ -738,7 +743,7 @@ int change_dir_aux(char* dirname, int* cur_dir, Disk* disk) {
     if (!strncmp(dirname, "..", MAX_PATH_LENGTH)) {
         Dir* parent_dir_ptr = get_dir_ptr(cur_dir_ptr->parent_dir, disk);
         if (!cur_dir_ptr->parent_dir) {
-            printf("Unable to open directory: root has no parent directory!\n");
+            //printf("Unable to open directory: root has no parent directory!\n");
             return -1;
         }
         int j = 0;
@@ -799,8 +804,7 @@ FileHead* open_file(char* filename, int cur_dir, Disk* disk) {
             return head;
         }
     }
-    if (!directory_exists)
-        printf("File not present in the current_directory!\n");
+    printf("File not present in the current_directory!\n");
     return NULL;
 }
 
@@ -817,8 +821,9 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
     // Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
-    if (!file_exists(filename, cur_dir, disk)) {
-        printf("Unable to read file: %s doesn't exist in the current directory!\n", filename);
+    int ret = file_exists(filename, cur_dir, disk);
+    if (!ret || ret == -1) {
+        printf("Unable to read file: %s doesn't exist!\n", filename);
         return -1;
     }
 
@@ -921,11 +926,6 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
 int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Disk* disk) {
     if (DEBUG) {
         printf("Writing file %s\n", filename);
-        printf("Input is:\n");
-        for (int i = 0; buf[i]; i++) {
-            printf("%c", buf[i]);
-        }
-        printf("\n");
     }
     if (n_bytes < 0) {
         printf("Error: number of bytes is invalid!\n");
@@ -935,8 +935,9 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
     
-    if (!file_exists(filename, cur_dir, disk)) {
-        printf("Unable to write file: %s doesn't exist in the current directory!\n", filename);
+    int ret = file_exists(filename, cur_dir, disk);
+    if (!ret || ret == -1) {
+        printf("Unable to write file: %s doesn't exist!\n", filename);
         return -1;
     }
 
@@ -982,6 +983,20 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     if (pos && (pos >= head->size || pos < -2)) {
         printf("Error: position is invalid!\n");
         return -1;
+    }
+
+    printf("Input to write (ENTER to confirm):\n");
+    char cc = (char) fgetc(stdin);
+    for (int i = 0; cc != '\n'; i++) {
+        buf[i] = cc;
+        cc = (char) fgetc(stdin);
+    }
+    if (DEBUG) {
+        printf("Input is:\n");
+        for (int i = 0; buf[i]; i++) {
+            printf("%c", buf[i]);
+        }
+        printf("\n");
     }
 
     int sum = 0;    // sum of written bytes
@@ -1114,8 +1129,9 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
     // Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
-    if (!file_exists(filename, cur_dir, disk)) {
-        printf("Unable to seek in file: %s doesn't exist in the current directory!\n", filename);
+    int ret = file_exists(filename, cur_dir, disk);
+    if (!ret || ret == -1) {
+        printf("Unable to seek in file: %s doesn't exist!\n", filename);
         return -1;
     }
 
