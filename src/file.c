@@ -74,16 +74,18 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
     char prevtoken[30];
     int token_count = 0;
     char* token = strtok(filenamecpy, "/");
+    if (token)
+        token_count++;
     memset(path, 0, strlen(path) + 1);
     //printf("path: %s\n", path);
     //printf("token: %s\n", token);
     while(token) {
-        token_count++;
         strncpy(prevtoken, token, strlen(token) + 1);
         //printf("prevtoken: %s\n", prevtoken);
         token = strtok(NULL, "/");
         if (token) {
-            if (token_count > 1)
+            token_count++;
+            if (token_count > 1 && strncmp(filename, "..", 2))
                 strncat(path, "/", 2);
             strncat(path, prevtoken, strlen(prevtoken) + 1);
             //printf("path: %s\n", path);
@@ -94,9 +96,9 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
         if (!path[0])
             path[0] ='/';
         //printf("Path: %s\nFilename: %s\n", path, prevtoken);
-        int dir_for_file = cur_dir;
+        int dir_for_file;
         if (!dir_exists(path, cur_dir, disk, &dir_for_file)) {
-            printf("Unable to create file: directory doesn't exist!\n");
+            printf("Error: directory %s doesn't exist!\n", path);
             directory_exists = 1;
             return 1;
         }
@@ -104,12 +106,19 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
         memset(filenamecpy2, 0, strlen(filenamecpy2) + 1);
         strncpy(filenamecpy2, prevtoken, strlen(prevtoken) + 1);
         // Needs to change cur_dir to the correct directory
-        if (dir_for_file)
+        //Dir* t_ptr = get_dir_ptr(cur_dir, disk);
+        //printf("Cur dir before dir_for_file is %s\n", t_ptr->name);
+        //printf("Files: %d\nDirs: %d\n", t_ptr->num_files, t_ptr->num_dirs);
+        if (dir_for_file) {
             cur_dir = dir_for_file;
+            if (DEBUG)
+                printf("Cur dir changed to %s (dir_for_file)\n", get_dir_ptr(cur_dir, disk)->name);
+        }
     }
 
     Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     //printf("Cur dir: %s\n", cur_dir_ptr->name);
+    //printf("Files: %d\nDirs: %d\n", cur_dir_ptr->num_files, cur_dir_ptr->num_dirs);
     for (int i = 0; i < cur_dir_ptr->num_files + cur_dir_ptr->num_dirs; i++) {
         FileHead* file_ptr = get_file_head_ptr(cur_dir_ptr->files[i], disk);
         //printf("Comparing %s : %s\n", file_ptr->name, filenamecpy2);
@@ -124,14 +133,17 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
 
 int dir_exists(char* dirname, int cur_dir, Disk* disk, int* dir_for_file) {
     if (DEBUG)
-        printf("Checking existance of directory %s...\n", dirname);
+        printf("Checking existance of directory %s ...\n", dirname);
     if (!strncmp(dirname, "", MAX_PATH_LENGTH) || !strncmp(dirname, "/", MAX_PATH_LENGTH)) {
         if (dir_for_file)
             *dir_for_file = disk->root_dir;
+        if (DEBUG)
+            printf("Dir %s exists\n", dirname);
         return 1;
     }
     if (!strncmp(dirname, "/", 1))
         cur_dir = disk->root_dir;
+    //printf("Cur dir is %s\n", get_dir_ptr(cur_dir, disk)->name);
     char dirnamecpy[MAX_PATH_LENGTH];
     char prevtoken[30];
     strncpy(dirnamecpy, dirname, strlen(dirname) + 1);
@@ -141,8 +153,10 @@ int dir_exists(char* dirname, int cur_dir, Disk* disk, int* dir_for_file) {
         strncpy(prevtoken, token, strlen(token) + 1);
         int ret = dir_exists_aux(token, &cur_dir, disk);
         //printf("Dir: %s\n", get_dir_ptr(cur_dir, disk)->name);
-        if (dir_for_file)
+        if (dir_for_file) {
             *dir_for_file = cur_dir;
+            //printf("dir_for_file is now %s\n", get_dir_ptr(*dir_for_file, disk)->name);
+        }
         token = strtok(NULL, "/");
         if (!ret) {
             if (!token) {
@@ -162,7 +176,7 @@ int dir_exists(char* dirname, int cur_dir, Disk* disk, int* dir_for_file) {
 
 int dir_exists_aux(char* dirname, int* cur_dir, Disk* disk) {
     if (DEBUG)
-        printf("Checking existance of directory %s...\n", dirname);
+        printf("Checking existance of directory %s (aux)...\n", dirname);
     Dir* cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
     if (!strncmp(dirname, "..", MAX_PATH_LENGTH) && !cur_dir_ptr->parent_dir) {
         printf("Unable to open directory: root has no parent directory!\n");
@@ -178,7 +192,8 @@ int dir_exists_aux(char* dirname, int* cur_dir, Disk* disk) {
     for (int i = 0; i < cur_dir_ptr->num_dirs + cur_dir_ptr->num_files; i++) {
         Dir* subdir_ptr = get_dir_ptr(cur_dir_ptr->files[i], disk);
         if (!strncmp(subdir_ptr->name, dirname, MAX_PATH_LENGTH) && subdir_ptr->is_dir) {
-            printf("Directory %s exists\n", subdir_ptr->name);
+            if (DEBUG)
+                printf("Directory %s exists\n", subdir_ptr->name);
             *cur_dir = subdir_ptr->idx;
             return 1;
         }
@@ -208,16 +223,18 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     char prevtoken[30];
     int token_count = 0;
     char* token = strtok(filenamecpy, "/");
+    if (token)
+        token_count++;
     memset(path, 0, strlen(path) + 1);
     //printf("path: %s\n", path);
     //printf("token: %s\n", token);
     while(token) {
-        token_count++;
         strncpy(prevtoken, token, strlen(token) + 1);
         //printf("prevtoken: %s\n", prevtoken);
         token = strtok(NULL, "/");
         if (token) {
-            if (token_count > 1)
+            token_count++;
+            if (token_count > 1 && strncmp(filename, "..", 2))
                 strncat(path, "/", 2);
             strncat(path, prevtoken, strlen(prevtoken) + 1);
             //printf("path: %s\n", path);
@@ -311,15 +328,17 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         int token_count = 0;
         char* token = strtok(dirnamecpy, "/");
         memset(path, 0, strlen(path) + 1);
+        if (token)
+            token_count++;
         //printf("path: %s\n", path);
         //printf("token: %s\n", token);
         while(token) {
-            token_count++;
             strncpy(prevtoken, token, strlen(token) + 1);
             //printf("prevtoken: %s\n", prevtoken);
             token = strtok(NULL, "/");
             if (token) {
-                if (token_count > 1)
+                token_count++;
+                if (token_count > 1 && strncmp(dirname, "..", 2))
                     strncat(path, "/", 2);
                 strncat(path, prevtoken, strlen(prevtoken) + 1);
                 //printf("path: %s\n", path);
@@ -406,16 +425,18 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     char prevtoken[30];
     int token_count = 0;
     char* token = strtok(filenamecpy, "/");
+    if (token)
+        token_count++;
     memset(path, 0, strlen(path) + 1);
     //printf("path: %s\n", path);
     //printf("token: %s\n", token);
     while(token) {
-        token_count++;
         strncpy(prevtoken, token, strlen(token) + 1);
         //printf("prevtoken: %s\n", prevtoken);
         token = strtok(NULL, "/");
         if (token) {
-            if (token_count > 1)
+            token_count++;
+            if (token_count > 1 && strncmp(filename, "..", 2))
                 strncat(path, "/", 2);
             strncat(path, prevtoken, strlen(prevtoken) + 1);
             //printf("path: %s\n", path);
@@ -511,16 +532,18 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
     char prevtoken[30];
     int token_count = 0;
     char* token = strtok(dirnamecpy, "/");
+    if (token)
+        token_count++;
     memset(path, 0, strlen(path) + 1);
     //printf("path: %s\n", path);
     //printf("token: %s\n", token);
     while(token) {
-        token_count++;
         strncpy(prevtoken, token, strlen(token) + 1);
         //printf("prevtoken: %s\n", prevtoken);
         token = strtok(NULL, "/");
         if (token) {
-            if (token_count > 1)
+            token_count++;
+            if (token_count > 1 && strncmp(dirname, "..", 2))
                 strncat(path, "/", 2);
             strncat(path, prevtoken, strlen(prevtoken) + 1);
             //printf("path: %s\n", path);
@@ -638,7 +661,7 @@ int list_dir(int dir, Disk* disk) {
     printf("Content of %s:\n", dir_ptr->name);
     int i;
     int sum = 0;
-    printf("Dir\tName\t\t\t\t\tFiles/Size\tBlock index:\n");
+    printf("Dir\tName\t\t\t\t\tDirs\tFiles\tSize\tCur pos\t\tBlock index\n");
     for (i = 0; i < dir_ptr->num_dirs + dir_ptr->num_files; i++) {
         // printf("Getting subdir pointer to %d\n", dir_ptr->files[i]);
         Dir* subdir_ptr = get_dir_ptr(dir_ptr->files[i], disk);
@@ -647,7 +670,7 @@ int list_dir(int dir, Disk* disk) {
             return -1;
         }
         if (subdir_ptr->is_dir) {
-            printf("%d\t%s\t\t\t\t\t%d\t\t%d\n", subdir_ptr->is_dir, subdir_ptr->name, subdir_ptr->num_files, subdir_ptr->idx);
+            printf("%d\t%s\t\t\t\t\t%d\t%d\t-\t-\t\t%d\n", subdir_ptr->is_dir, subdir_ptr->name, subdir_ptr->num_dirs, subdir_ptr->num_files, subdir_ptr->idx);
             sum++;
         }
     }
@@ -659,7 +682,7 @@ int list_dir(int dir, Disk* disk) {
             return -1;
         }
         if (!file_ptr->is_dir) {
-            printf("%d\t%s\t\t\t\t\t%d\t\t%d\n", file_ptr->is_dir, file_ptr->name, file_ptr->size, file_ptr->idx);
+            printf("%d\t%s\t\t\t\t\t-\t-\t%d\t%d\t\t%d\n", file_ptr->is_dir, file_ptr->name, file_ptr->size, file_ptr->pos, file_ptr->idx);
             sum++;
         }
     }
@@ -684,6 +707,8 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
         memset(disk->cur_path, 0, MAX_PATH_LENGTH);
         disk->cur_path[0] = '/';
         *cur_dir = disk->root_dir;
+        if (DEBUG)
+            printf("Switched current directory to %s\n", disk->cur_path);
     }
     char dirnamecpy[MAX_PATH_LENGTH];
     strncpy(dirnamecpy, dirname, strlen(dirname) + 1);
@@ -776,14 +801,50 @@ FileHead* open_file(char* filename, int cur_dir, Disk* disk) {
 int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
     if (DEBUG)
         printf("Reading file %s\n", filename);
+
+    if (n_bytes < 0) {
+        printf("Error: number of bytes is invalid!\n");
+        return -1;
+    }
+    
+    char filenamecpy[MAX_PATH_LENGTH];
+    strncpy(filenamecpy, filename, strlen(filename) + 1);
+
     // Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
     if (!file_exists(filename, cur_dir, disk)) {
         printf("Unable to read file: %s doesn't exist in the current directory!\n", filename);
         return -1;
     }
-    if (n_bytes < 0) {
-        printf("Error: number of bytes is invalid!\n");
-        return -1;
+
+    //printf("filenamecpy: %s\n", filenamecpy);
+    char path[MAX_PATH_LENGTH];
+    char prevtoken[30];
+    int token_count = 0;
+    char* token = strtok(filenamecpy, "/");
+    if (token)
+        token_count++;
+    memset(path, 0, strlen(path) + 1);
+    //printf("path: %s\n", path);
+    //printf("token: %s\n", token);
+    while(token) {
+        strncpy(prevtoken, token, strlen(token) + 1);
+        //printf("prevtoken: %s\n", prevtoken);
+        token = strtok(NULL, "/");
+        if (token) {
+            token_count++;
+            if (token_count > 1 && strncmp(filename, "..", 2))
+                strncat(path, "/", 2);
+            strncat(path, prevtoken, strlen(prevtoken) + 1);
+            //printf("path: %s\n", path);
+        }
+        //printf("token: %s\n", token);
+    }
+    if (token_count > 1 || !strncmp(filename, "/", 1)) {
+        //  printf("Path: %s\nFilename: %s\n", path, prevtoken);
+        change_dir(path, &disk->cur_dir, disk);
+        cur_dir = disk->cur_dir;
+        memset(filename, 0, strlen(filename) + 1);
+        strncpy(filename, prevtoken, strlen(prevtoken) + 1);
     }
 
     FileHead* head = open_file(filename, cur_dir, disk);
@@ -852,10 +913,6 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
 }
 
 int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Disk* disk) {
-    if (!file_exists(filename, cur_dir, disk)) {
-        printf("Unable to write file: %s doesn't exist in the current directory!\n", filename);
-        return -1;
-    }
     if (DEBUG) {
         printf("Writing file %s\n", filename);
         printf("Input is:\n");
@@ -868,9 +925,45 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         printf("Error: number of bytes is invalid!\n");
         return -1;
     }
-    int input_len = 0;
-    for (int i = 0; buf[i]; i++)
-        input_len++;
+
+    char filenamecpy[MAX_PATH_LENGTH];
+    strncpy(filenamecpy, filename, strlen(filename) + 1);
+    
+    if (!file_exists(filename, cur_dir, disk)) {
+        printf("Unable to write file: %s doesn't exist in the current directory!\n", filename);
+        return -1;
+    }
+
+    //printf("filenamecpy: %s\n", filenamecpy);
+    char path[MAX_PATH_LENGTH];
+    char prevtoken[30];
+    int token_count = 0;
+    char* token = strtok(filenamecpy, "/");
+    if (token)
+        token_count++;
+    memset(path, 0, strlen(path) + 1);
+    //printf("path: %s\n", path);
+    //printf("token: %s\n", token);
+    while(token) {
+        strncpy(prevtoken, token, strlen(token) + 1);
+        //printf("prevtoken: %s\n", prevtoken);
+        token = strtok(NULL, "/");
+        if (token) {
+            token_count++;
+            if (token_count > 1 && strncmp(filename, "..", 2))
+                strncat(path, "/", 2);
+            strncat(path, prevtoken, strlen(prevtoken) + 1);
+            //printf("path: %s\n", path);
+        }
+        //printf("token: %s\n", token);
+    }
+    if (token_count > 1 || !strncmp(filename, "/", 1)) {
+        //  printf("Path: %s\nFilename: %s\n", path, prevtoken);
+        change_dir(path, &disk->cur_dir, disk);
+        cur_dir = disk->cur_dir;
+        memset(filename, 0, strlen(filename) + 1);
+        strncpy(filename, prevtoken, strlen(prevtoken) + 1);
+    }
 
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head && DEBUG) {
@@ -892,6 +985,10 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     File* file;     // pointer to the disk block
     int next_idx;   // to update the FAT after allocating a new block
     int buf_pos = 0;    // current position in the input buffer
+
+    int input_len = 0;
+    for (int i = 0; buf[i]; i++)
+        input_len++;
 
     if (!n_bytes) {
         int len = 0;
@@ -1006,6 +1103,47 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
         printf("Position not valid!\n");
         return -1;
     }
+
+    char filenamecpy[MAX_PATH_LENGTH];
+    strncpy(filenamecpy, filename, strlen(filename) + 1);
+
+    // Dir* cur_dir_ptr = get_dir_ptr(cur_dir, disk);
+    if (!file_exists(filename, cur_dir, disk)) {
+        printf("Unable to seek in file: %s doesn't exist in the current directory!\n", filename);
+        return -1;
+    }
+
+    //printf("filenamecpy: %s\n", filenamecpy);
+    char path[MAX_PATH_LENGTH];
+    char prevtoken[30];
+    int token_count = 0;
+    char* token = strtok(filenamecpy, "/");
+    if (token)
+        token_count++;
+    memset(path, 0, strlen(path) + 1);
+    //printf("path: %s\n", path);
+    //printf("token: %s\n", token);
+    while(token) {
+        strncpy(prevtoken, token, strlen(token) + 1);
+        //printf("prevtoken: %s\n", prevtoken);
+        token = strtok(NULL, "/");
+        if (token) {
+            token_count++;
+            if (token_count > 1 && strncmp(filename, "..", 2))
+                strncat(path, "/", 2);
+            strncat(path, prevtoken, strlen(prevtoken) + 1);
+            //printf("path: %s\n", path);
+        }
+        //printf("token: %s\n", token);
+    }
+    if (token_count > 1 || !strncmp(filename, "/", 1)) {
+        //  printf("Path: %s\nFilename: %s\n", path, prevtoken);
+        change_dir(path, &disk->cur_dir, disk);
+        cur_dir = disk->cur_dir;
+        memset(filename, 0, strlen(filename) + 1);
+        strncpy(filename, prevtoken, strlen(prevtoken) + 1);
+    }
+
     FileHead* file = open_file(filename, cur_dir, disk);
     if (!file)
         handle_error("Error opening file");
