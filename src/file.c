@@ -98,9 +98,9 @@ int file_exists(char* filename, int cur_dir, Disk* disk) {
         //printf("Path: %s\nFilename: %s\n", path, prevtoken);
         int dir_for_file;
         if (!dir_exists(path, cur_dir, disk, &dir_for_file)) {
-            printf("Error: directory %s doesn't exist!\n", path);
+            //printf("Error: directory %s doesn't exist!\n", path);
             directory_exists = 1;
-            return 1;
+            return -1;
         }
         //printf("DIR FOR FILE: %s\n", get_dir_ptr(dir_for_file, disk)->name);
         memset(filenamecpy2, 0, strlen(filenamecpy2) + 1);
@@ -164,7 +164,8 @@ int dir_exists(char* dirname, int cur_dir, Disk* disk, int* dir_for_file) {
                     printf("Directory does not exist!\n");
                 return 0;
             } else {
-                printf("Unable to open directory: directory %s doesn't exist!\n", prevtoken);
+                if (!directory_exists)
+                    printf("Unable to open directory: directory %s doesn't exist!\n", prevtoken);
                 invalid_directory = 1;
                 return 0;
             }
@@ -212,8 +213,11 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
-    if (file_exists(filename, parent_dir, disk)) {
-        if (!directory_exists)
+    int ret = file_exists(filename, parent_dir, disk);
+    if (ret) {
+        if (ret == -1)
+            printf("Unable to create file: directory does not exist!\n");
+        else
             printf("Unable to create file: file already exists!\n");
         return -1;
     }
@@ -454,7 +458,8 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
 
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head) {
-        printf("Unable to delete file: file doesn't exist in current directory!\n");
+        if (!directory_exists)
+            printf("Unable to delete file: file doesn't exist in current directory!\n");
         return -1;
     }
 
@@ -794,7 +799,8 @@ FileHead* open_file(char* filename, int cur_dir, Disk* disk) {
             return head;
         }
     }
-    printf("File not present in the current_directory!\n");
+    if (!directory_exists)
+        printf("File not present in the current_directory!\n");
     return NULL;
 }
 
