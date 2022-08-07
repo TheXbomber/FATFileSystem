@@ -95,22 +95,34 @@ int main(int argc, char** argv) {
             else
                 delete_file((char*) args[0], disk->cur_dir, 0, disk);
         } else if (!strncmp(cmd, "rd", MAX_CMD_LENGTH)) {
-            if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH) || !strncmp(args[2], "", MAX_ARG_LENGTH))
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH))
                 printf("Usage: rd <filename> <position> <number of bytes>\n");
-            else
+            else {
+                if (!args[1])
+                    args[1][0] = '0';
+                if (!args[2])
+                    args[2][0] = '0';
                 read_file((char*) args[0], atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
+            }
         } else if (!strncmp(cmd, "wr", MAX_CMD_LENGTH)) {
-            if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH) || !strncmp(args[2], "", MAX_ARG_LENGTH))
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH))
                 printf("Usage: wr <filename> <position> <number of bytes>\n");
             else {
                 char buf[2048] = {};
+                if (!args[1])
+                    args[1][0] = '0';
+                if (!args[2])
+                    args[2][0] = '0';
                 write_file(args[0], buf, atoi(args[1]), atoi(args[2]), disk->cur_dir, disk);
             }
         } else if (!strncmp(cmd, "seek", MAX_CMD_LENGTH)) {
-            if (!strncmp(args[0], "", MAX_ARG_LENGTH) || !strncmp(args[1], "", MAX_ARG_LENGTH))
+            if (!strncmp(args[0], "", MAX_ARG_LENGTH))
                 printf("Usage: seek <filename> <position>\n");
-            else
+            else {
+                if (!args[1])
+                    args[1][0] = '0';
                 seek_in_file((char*) args[0], atoi(args[1]), disk->cur_dir, disk);
+            }
         } else if (!strncmp(cmd, "mkdir", MAX_CMD_LENGTH)) {
             if (!strncmp(args[0], "", MAX_ARG_LENGTH))
                 printf("Usage: mkdir <dirname>\n");
