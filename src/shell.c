@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
             printf(" - mkdir <dirname> : create a directory\n");
             printf(" - rmdir <dirname> : delete a directory and all of its content\n");
             printf(" - cd <dirname> : open a directory\n");
-            printf(" - ls : list the content of the current directory\n");
+            printf(" - ls <dirname> : list the content of a directory (leave blank for current)\n");
             printf(" - pwd : print the current directory\n");
             printf(" - format : format the disk\n");
         } else if (!strncmp(cmd, "q", MAX_CMD_LENGTH) || !strncmp(cmd, "quit", MAX_CMD_LENGTH)) {
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
         } else if (!strncmp(cmd, "cd", MAX_CMD_LENGTH)) {
             change_dir((char*) args[0], &disk->cur_dir, disk);
         } else if (!strncmp(cmd, "ls", MAX_CMD_LENGTH)) {
-            list_dir(disk->cur_dir, disk);
+            list_dir((char*) args[0], disk->cur_dir, disk);
         } else if (!strncmp(cmd, "pwd", MAX_CMD_LENGTH)) {
             print_cur_dir(disk);
         } else if (!strncmp(cmd, "disk_print", MAX_CMD_LENGTH) || !strncmp(cmd, "dp", MAX_CMD_LENGTH)) {

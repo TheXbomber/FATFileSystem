@@ -58,7 +58,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk);
 int change_dir_aux(char* dirname, int* cur_dir, Disk* disk);
 
 // lists the directory in the current position and returns the number of directories listed
-int list_dir(int dir, Disk* disk);
+int list_dir(char* dirname, int cur_dir, Disk* disk);
 
 // returns 1 if a file named filename already exists in the current directory
 int file_exists(char* filename, int cur_dir, Disk* disk);

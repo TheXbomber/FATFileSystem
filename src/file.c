@@ -556,6 +556,10 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
 }
 
 int delete_dir(char* dirname, int cur_dir, Disk* disk) {
+    if (!strncmp(dirname, "/", MAX_PATH_LENGTH)) {
+        printf("Unable to delete directory: root directory cannot be deleted!\n");
+        return -1;
+    }
     int ret = dir_exists(dirname, cur_dir, disk, NULL);
     if (!ret) {
         printf("Unable to delete directory: directory doesn't exist!\n");
@@ -696,12 +700,25 @@ int delete_dir_aux(Disk* disk, Dir* cur_dir, Dir* dir) {
     return 0;
 }
 
-int list_dir(int dir, Disk* disk) {
-    Dir* dir_ptr = get_dir_ptr(dir, disk);
-    if (!dir_ptr) {
-            printf("Error getting dir pointer\n");
+int list_dir(char* dirname, int cur_dir, Disk* disk) {
+    // printf("Cur path: %s\n", disk->cur_path);
+    // printf("Cur dir: %s\n", get_dir_ptr(cur_dir, disk)->name);
+    // printf("Listing: %s\n", dirname);
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
+    int ret;
+    if (strncmp(dirname, "", MAX_PATH_LENGTH)) {
+        ret = change_dir(dirname, &cur_dir, disk);
+        if (ret)
             return -1;
-        }
+    }
+
+    Dir* dir_ptr = get_dir_ptr(cur_dir, disk);
+    if (!dir_ptr) {
+        printf("Error getting dir pointer\n");
+        change_dir(old_path, &cur_dir, disk);
+        return -1;
+    }
     printf("Content of %s:\n", dir_ptr->name);
     int i;
     int sum = 0;
@@ -730,6 +747,7 @@ int list_dir(int dir, Disk* disk) {
             sum++;
         }
     }
+    change_dir(old_path, &cur_dir, disk);
     return sum;
 }
 
@@ -744,7 +762,8 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
             printf("Switched current directory to %s\n", disk->cur_path);
         return 0;
     }
-    if (!dir_exists(dirname, *cur_dir, disk, NULL)) {
+    int ret = dir_exists(dirname, *cur_dir, disk, NULL);
+    if (!ret || ret == -1) {
         printf("Unable to open directory: directory doesn't exist!\n");
         return -1;
     }
@@ -761,7 +780,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
     char* token = strtok(dirnamecpy, "/");
     //printf("token is %s\n", token);
     while (token) {
-        int ret = change_dir_aux(token, cur_dir, disk);
+        ret = change_dir_aux(token, cur_dir, disk);
         if (DEBUG && ret) {
             printf("Error changing directory!\n");
             return -1;
@@ -797,6 +816,7 @@ int change_dir_aux(char* dirname, int* cur_dir, Disk* disk) {
             j++;
         }
         *cur_dir = parent_dir_ptr->idx;
+        disk->cur_dir = *cur_dir;
         if (DEBUG)
             printf("Switched current directory to %s\n", parent_dir_ptr->name);
         return 0;
@@ -807,6 +827,7 @@ int change_dir_aux(char* dirname, int* cur_dir, Disk* disk) {
             if (strncmp(cur_dir_ptr->name, "/", 30))
                 strncat(disk->cur_path, "/", 2);
             *cur_dir = subdir_ptr->idx;
+            disk->cur_dir = *cur_dir;
             cur_dir_ptr = get_dir_ptr(*cur_dir, disk);
             strncat(disk->cur_path, cur_dir_ptr->name, strlen(cur_dir_ptr->name));
             if (DEBUG)
