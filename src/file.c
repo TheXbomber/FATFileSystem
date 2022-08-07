@@ -215,7 +215,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     if (DEBUG)
         printf("Creating file %s...\n", filename);
 
-    char old_path[MAX_PATH_LENGTH];
+    char* old_path = (char*) calloc(MAX_PATH_LENGTH, sizeof(char));
     strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
@@ -226,6 +226,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
             printf("Unable to create file: directory does not exist!\n");
         else
             printf("Unable to create file: file already exists!\n");
+        free(old_path);
         return -1;
     }
 
@@ -265,6 +266,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     if (strlen(filename) > 30) {
         printf("Unable to create file: file name length cannot exceed 30 characters!\n");
         change_dir(old_path, &parent_dir, disk);
+        free(old_path);
         return -1;
     }
 
@@ -273,6 +275,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     if (!start_block) {
         printf("Unable to create file: not enough FAT blocks available!\n");
         change_dir(old_path, &parent_dir, disk);
+        free(old_path);
         return -1;
     }
 
@@ -281,6 +284,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     if (!head) {
         printf("Unable to create file: cannot find a block in the disk!\n");
         change_dir(old_path, &parent_dir, disk);
+        free(old_path);
         return -1;
     }
     head->idx = get_block_idx(disk);
@@ -294,6 +298,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     head->start = get_fat_entry_idx(disk, start_block);
     if (head->start == -1) {
         printf("Error getting FAT entry index!\n");
+        free(old_path);
         return -1;
     }
     Dir* parent_dir_ptr = get_dir_ptr(parent_dir, disk);
@@ -323,7 +328,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     change_dir(old_path, &parent_dir, disk);
     if (DEBUG)
         printf("Name: %s\tParent directory: %s\tSize: %d\tIndex: %d\tFAT idx: %d\n", head->name, parent_dir_ptr->name, head->size, head->idx, head->start);
-
+    free(old_path);
     return 0;
 }
 
@@ -340,7 +345,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         return NULL;
     }
 
-    char old_path[MAX_PATH_LENGTH];
+    char* old_path = (char*) calloc(MAX_PATH_LENGTH, sizeof(char));
     strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     if (parent_dir) {
         char dirnamecpy[MAX_PATH_LENGTH];
@@ -380,6 +385,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         if (strlen(dirname) > 30) {
             printf("Unable to create directory: directory name length cannot exceed 30 characters!\n");
             change_dir(old_path, &parent_dir, disk);
+            free(old_path);
             return NULL;
         }
     }
@@ -389,6 +395,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     if (!start_block) {
         handle_error("unable to create directory: not enough blocks available!");
         change_dir(old_path, &parent_dir, disk);
+        free(old_path);
         return NULL;
     }
 
@@ -396,12 +403,14 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     Dir* new_dir = (Dir*) find_block(disk);
     if (!new_dir) {
         change_dir(old_path, &parent_dir, disk);
+        free(old_path);
         handle_error("unable to create directory: cannot find a block in the disk!");
     }
 
     new_dir->idx = get_block_idx(disk);
     if (!new_dir->idx) {
         printf("Error getting block index!\n");
+        free(old_path);
         return NULL;
     }
     new_dir->is_dir = 1;
@@ -434,6 +443,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
             printf("Name: %s\t Parent dir: -\tFiles: %d\tIndex: %d\n", new_dir->name, new_dir->num_files, new_dir->idx);
     }
 
+    free(old_path);
     return new_dir;
 }
 
