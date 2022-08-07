@@ -215,6 +215,8 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     if (DEBUG)
         printf("Creating file %s...\n", filename);
 
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
@@ -262,6 +264,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
 
     if (strlen(filename) > 30) {
         printf("Unable to create file: file name length cannot exceed 30 characters!\n");
+        change_dir(old_path, &parent_dir, disk);
         return -1;
     }
 
@@ -269,13 +272,17 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     FatEntry* start_block = request_fat_blocks(disk, NULL, 1);
     if (!start_block) {
         printf("Unable to create file: not enough FAT blocks available!\n");
+        change_dir(old_path, &parent_dir, disk);
         return -1;
     }
 
     // request disk block for head
     FileHead* head = (FileHead*) find_block(disk);
-    if (!head)
+    if (!head) {
         printf("Unable to create file: cannot find a block in the disk!\n");
+        change_dir(old_path, &parent_dir, disk);
+        return -1;
+    }
     head->idx = get_block_idx(disk);
     start_block->file = head->idx;
     for (int i = 0; filename[i]; i++)
@@ -313,6 +320,7 @@ int create_file(char* filename, int parent_dir, Disk* disk) {
     //printf("block->file: %p %p free: %d\n", block->file, *block->file, (*block->file)->free_in_block);
 
     printf("File %s created successfully\n", filename);
+    change_dir(old_path, &parent_dir, disk);
     if (DEBUG)
         printf("Name: %s\tParent directory: %s\tSize: %d\tIndex: %d\tFAT idx: %d\n", head->name, parent_dir_ptr->name, head->size, head->idx, head->start);
 
@@ -332,6 +340,8 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
         return NULL;
     }
 
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     if (parent_dir) {
         char dirnamecpy[MAX_PATH_LENGTH];
         strncpy(dirnamecpy, dirname, strlen(dirname) + 1);
@@ -369,6 +379,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
 
         if (strlen(dirname) > 30) {
             printf("Unable to create directory: directory name length cannot exceed 30 characters!\n");
+            change_dir(old_path, &parent_dir, disk);
             return NULL;
         }
     }
@@ -377,13 +388,16 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
     FatEntry* start_block = request_fat_blocks(disk, NULL, 1);
     if (!start_block) {
         handle_error("unable to create directory: not enough blocks available!");
+        change_dir(old_path, &parent_dir, disk);
         return NULL;
     }
 
     // save directory on disk
     Dir* new_dir = (Dir*) find_block(disk);
-    if (!new_dir)
+    if (!new_dir) {
+        change_dir(old_path, &parent_dir, disk);
         handle_error("unable to create directory: cannot find a block in the disk!");
+    }
 
     new_dir->idx = get_block_idx(disk);
     if (!new_dir->idx) {
@@ -412,6 +426,7 @@ Dir* create_dir(char* dirname, int parent_dir, Disk* disk) {
 
     if (parent_dir)
         printf("Directory %s created successfully\n", dirname);
+    change_dir(old_path, &parent_dir, disk);
     if (DEBUG) {
         if (parent_dir)
             printf("Name: %s\t Parent dir: %s\tFiles: %d\tIndex: %d\n", new_dir->name, parent_dir_ptr->name, new_dir->num_files, new_dir->idx);
@@ -426,6 +441,8 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     if (DEBUG)
         printf("Deleting file %s\n", filename);
 
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
@@ -472,6 +489,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
     FileHead* head = open_file(filename, cur_dir, disk);
     if (!head) {
         printf("Unable to delete file: file doesn't exist in current directory!\n");
+        change_dir(old_path, &cur_dir, disk);
         return -1;
     }
 
@@ -531,6 +549,7 @@ int delete_file(char* filename, int cur_dir, int sub, Disk* disk) {
             break;
     }
     cur_dir_ptr->num_files--;
+    change_dir(old_path, &cur_dir, disk);
     if (!sub || DEBUG)
         printf("File %s deleted succesfully\n", filename);
     return 0;
@@ -546,6 +565,8 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
         return -1;
     }
 
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char dirnamecpy[MAX_PATH_LENGTH];
     strncpy(dirnamecpy, dirname, strlen(dirname) + 1);
     char path[MAX_PATH_LENGTH];
@@ -602,6 +623,7 @@ int delete_dir(char* dirname, int cur_dir, Disk* disk) {
     if (ret)
         handle_error("Error in delete_dir_aux!");
     cur_dir_ptr->num_dirs--;
+    change_dir(old_path, &cur_dir, disk);
     printf("Directory %s deleted succesfully\n", dirname);
     return 0;
 }
@@ -717,6 +739,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
         memset(disk->cur_path, 0, MAX_PATH_LENGTH);
         disk->cur_path[0] = '/';
         *cur_dir = disk->root_dir;
+        disk->cur_dir = *cur_dir;
         if (DEBUG)
             printf("Switched current directory to %s\n", disk->cur_path);
         return 0;
@@ -729,6 +752,7 @@ int change_dir(char* dirname, int* cur_dir, Disk* disk) {
         memset(disk->cur_path, 0, MAX_PATH_LENGTH);
         disk->cur_path[0] = '/';
         *cur_dir = disk->root_dir;
+        disk->cur_dir = *cur_dir;
         if (DEBUG)
             printf("Switched current directory to %s\n", disk->cur_path);
     }
@@ -829,7 +853,9 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
         printf("Error: number of bytes is invalid!\n");
         return -1;
     }
-    
+
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
@@ -877,6 +903,7 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
         handle_error("error opening file!");
     if (pos >= head->size || pos < -2) {
         printf("Error: position is invalid!\n");
+        change_dir(old_path, &cur_dir, disk);
         return -1;
     }
 
@@ -934,6 +961,7 @@ int read_file(char* filename, int pos, int n_bytes, int cur_dir, Disk* disk) {
     }
     printf("\n");
     // printf("\nEnd of content\n");
+    change_dir(old_path, &cur_dir, disk);
     return sum;
 }
 
@@ -946,6 +974,8 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         return -1;
     }
 
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
     
@@ -998,6 +1028,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
     // printf("Opened file with head %p\n", head);
     if (pos && (pos >= head->size || pos < -2)) {
         printf("Error: position is invalid!\n");
+        change_dir(old_path, &cur_dir, disk);
         return -1;
     }
 
@@ -1132,6 +1163,7 @@ int write_file(char* filename, char* buf, int pos, int n_bytes, int cur_dir, Dis
         block_offset = 0;
     }
     printf("Successfully written %d bytes in %s\n", sum, filename);
+    change_dir(old_path, &cur_dir, disk);
     return sum;
 }
 
@@ -1141,6 +1173,8 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
         return -1;
     }
 
+    char old_path[MAX_PATH_LENGTH];
+    strncpy(old_path, disk->cur_path, strlen(disk->cur_path) + 1);
     char filenamecpy[MAX_PATH_LENGTH];
     strncpy(filenamecpy, filename, strlen(filename) + 1);
 
@@ -1189,6 +1223,7 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
         handle_error("Error opening file");
     if (pos > file->size) {
         printf("Position not valid!\n");
+        change_dir(old_path, &cur_dir, disk);
         return -1;
     }
     if (pos == -1)
@@ -1198,6 +1233,7 @@ int seek_in_file(char* filename, int pos, int cur_dir, Disk* disk) {
         printf("Current position in file '%s': end\n", filename);
     else
         printf("Current position in file '%s': %d\n", filename, file->pos);
+    change_dir(old_path, &cur_dir, disk);
     return file->pos;
 }
 
